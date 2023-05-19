@@ -4,6 +4,7 @@
 *.sqlite3
 dev.py
 production.py
+.env
 
 # Python and others
 __pycache__

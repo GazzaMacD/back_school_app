@@ -2,6 +2,8 @@
 /media/
 /static/
 *.sqlite3
+dev.py
+production.py
 
 # Python and others
 __pycache__

@@ -29,5 +29,5 @@ urlpatterns = urlpatterns + [
     # API routes
     path("api/v2/", api_router.urls),
     # Should be last in list
-    path("", include(wagtail_urls)),
+    # path("", include(wagtail_urls)),
 ]

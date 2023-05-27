@@ -31,9 +31,10 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # Application definition
 
 INSTALLED_APPS = [
-    #Wagtail
+    # Wagtail
     "home",
     "search",
+    "wagtail.api.v2",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
@@ -47,14 +48,14 @@ INSTALLED_APPS = [
     "wagtail",
     "modelcluster",
     "taggit",
-    #Django
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #project models
+    # project models
     "users",
 ]
 
@@ -90,7 +91,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
 
 
 # Password validation

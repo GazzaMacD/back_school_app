@@ -32,7 +32,6 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 INSTALLED_APPS = [
     # Wagtail
-    "home",
     "search",
     "wagtail.api.v2",
     "wagtail.contrib.forms",
@@ -57,6 +56,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # project models
     "users",
+    "home",
+    "lessons",
+    # Rest and auth
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

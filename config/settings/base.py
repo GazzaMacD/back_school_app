@@ -32,6 +32,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 INSTALLED_APPS = [
     # Wagtail
+    # "wagtail_headless_preview",
     "search",
     "wagtail.api.v2",
     "wagtail.contrib.forms",
@@ -156,6 +157,17 @@ MEDIA_URL = "/media/"
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "config"
+
+# Wagtail preview
+APP_SITE_ROOT_URL = os.getenv("APP_SITE_ROOT_URL")
+if not APP_SITE_ROOT_URL:
+    raise ImproperlyConfigured("APP_SITE_ROOT_URL env var needs to be set")
+
+WAGTAIL_HEADLESS_PREVIEW = {
+    "SERVE_BASE_URL": APP_SITE_ROOT_URL,
+    "REDIRECT_ON_PREVIEW": True,
+    "ENFORCE_TRAILING_SLASH": False,
+}
 
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html

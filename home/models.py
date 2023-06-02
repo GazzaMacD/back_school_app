@@ -2,10 +2,10 @@ from django.db import models
 
 from wagtail.models import Page
 
-# from wagtail_headless_preview.models import HeadlessMixin
+from wagtail_headless_preview.models import HeadlessMixin
 
 
-class HomePage(Page):
+class HomePage(HeadlessMixin, Page):
     pass
 
     # Page limitations

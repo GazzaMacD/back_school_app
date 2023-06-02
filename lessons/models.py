@@ -2,11 +2,11 @@ from django.db import models
 from wagtail.models import Page
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 
-# from wagtail_headless_preview.models import HeadlessMixin
+from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.api import APIField
 
 
-class LessonListPage(Page):
+class LessonListPage(HeadlessMixin, Page):
     """Page where lessons will be categorized and listed"""
 
     # Model fields

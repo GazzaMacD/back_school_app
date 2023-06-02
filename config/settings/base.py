@@ -32,7 +32,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 INSTALLED_APPS = [
     # Wagtail
-    # "wagtail_headless_preview",
+    "wagtail_headless_preview",
     "search",
     "wagtail.api.v2",
     "wagtail.contrib.forms",
@@ -164,6 +164,9 @@ if not APP_SITE_ROOT_URL:
     raise ImproperlyConfigured("APP_SITE_ROOT_URL env var needs to be set")
 
 WAGTAIL_HEADLESS_PREVIEW = {
+    "CLIENT_URLS": {
+        "default": f"{APP_SITE_ROOT_URL}/preview"  # adjust to match your front-end URL. e.g. locally it may be something like http://localhost:8020
+    },
     "SERVE_BASE_URL": APP_SITE_ROOT_URL,
     "REDIRECT_ON_PREVIEW": True,
     "ENFORCE_TRAILING_SLASH": False,

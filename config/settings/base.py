@@ -61,6 +61,16 @@ INSTALLED_APPS = [
     "lessons",
     # Rest and auth
     "rest_framework",
+    "rest_framework.authtoken",
+    # allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # dj_rest_auth
+    "dj_rest_auth",
+    # simple JWT
+    "rest_framework_simplejwt",
+    "dj_rest_auth.registration",
 ]
 
 MIDDLEWARE = [
@@ -176,6 +186,39 @@ WAGTAILSEARCH_BACKENDS = {
     "default": {
         "BACKEND": "wagtail.search.backends.database",
     }
+}
+
+# DRF Settings
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
+    ),
+}
+# AllAuth Settings
+SITE_ID = 1
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_VERIFICATION = "none"  # change to "mandatory" when email system set up
+# ACCOUNT_ADAPTER = "account.adapter.CustomAccoutAdapter"
+
+
+# DJ Rest Auth settings
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "__xl-auth__",
+    "JWT_AUTH_REFRESH_COOKIE": "__xl-refresh-token__",
+    "JWT_AUTH_SECURE": False,  # set to true for production
+    "JWT_AUTH_HTTPONLY": False,
+    "JWT_AUTH_RETURN_EXPIRATION": False,
+    "USER_DETAILS_SERIALIZER": "users.serializers.CustomUserDetailsSerializer",
+    "PASSWORD_RESET_USE_SITES_DOMAIN": True,
+    "OLD_PASSWORD_FIELD_ENABLED": True,
 }
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -

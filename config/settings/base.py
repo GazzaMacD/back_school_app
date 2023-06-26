@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from dotenv import load_dotenv
 import os
+import datetime
 from django.core.exceptions import ImproperlyConfigured
 from distutils.util import strtobool
 
@@ -219,6 +220,13 @@ REST_AUTH = {
     "USER_DETAILS_SERIALIZER": "users.serializers.CustomUserDetailsSerializer",
     "PASSWORD_RESET_USE_SITES_DOMAIN": True,
     "OLD_PASSWORD_FIELD_ENABLED": True,
+}
+
+# simple JWT settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
 }
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -

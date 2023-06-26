@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from dotenv import load_dotenv
 import os
@@ -19,6 +20,14 @@ from distutils.util import strtobool
 
 # Load environment variables
 load_dotenv()
+
+
+def env_get_or_raise(key: str) -> str:
+    env_var = os.environ.get(key)
+    if not env_var:
+        raise ImproperlyConfigured(f"Please set the '{key}' environment variable.")
+    return env_var
+
 
 # Base Project paths
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -200,7 +209,6 @@ REST_FRAMEWORK = {
 }
 # AllAuth Settings
 SITE_ID = 1
-
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
@@ -229,8 +237,8 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
 }
 
-# Base URL to use when referring to full URLs within the Wagtail admin backend -
-# e.g. in notification emails. Don't include '/admin' or a trailing slash
+
+# Base URL to use when referring to full URLs within the Wagtail admin backend - # e.g. in notification emails. Don't include '/admin' or a trailing slash
 WAGTAILADMIN_BASE_URL = "http://example.com"
 
 AUTH_USER_MODEL = "users.CustomUser"

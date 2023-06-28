@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
     # Django
+    "django.contrib.sites",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -213,8 +214,8 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_VERIFICATION = "none"  # change to "mandatory" when email system set up
-# ACCOUNT_ADAPTER = "account.adapter.CustomAccoutAdapter"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_ADAPTER = "users.adapter.CustomAccoutAdapter"
 
 
 # DJ Rest Auth settings

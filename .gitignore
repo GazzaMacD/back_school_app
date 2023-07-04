@@ -6,6 +6,7 @@ dev.py
 staging.py
 production.py
 .env
+.project_files
 
 # Python and others
 __pycache__

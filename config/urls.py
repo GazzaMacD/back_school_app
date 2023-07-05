@@ -30,11 +30,14 @@ if settings.DEBUG:
         path("__debug__/", include("debug_toolbar.urls")),
     ] + urlpatterns
 
+# APi and Page Patterns
+v2 = "api/v2"
 urlpatterns = urlpatterns + [
     # API routes
-    path("api/v2/auth/", include("dj_rest_auth.urls")),
-    path("api/v2/auth/registration/", include("dj_rest_auth.registration.urls")),
-    path("api/v2/", api_router.urls),
+    path(f"{v2}/lesson-categories/", include("lessons.urls")),
+    path(f"{v2}/auth/", include("dj_rest_auth.urls")),
+    path(f"{v2}/auth/registration/", include("dj_rest_auth.registration.urls")),
+    path(f"{v2}/", api_router.urls),
     # This path relates to the email that will be sent after requesting a password change
     # <django app base url>/api/v2/auth/password/reset/
     path(

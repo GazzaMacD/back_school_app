@@ -24,18 +24,26 @@ class LessonListPage(HeadlessMixin, Page):
     """Page where lessons will be categorized and listed"""
 
     # Model fields
-    jp_title = models.CharField(
+    ja_title = models.CharField(
         "Japanese Title",
         blank=False,
         null=False,
-        max_length=70,
-        help_text="Required. Max length 70 characters, 60 or less is ideal",
+        max_length=15,
+        help_text="Required. Max length 15 characters.",
+    )
+    short_intro = models.CharField(
+        "Short Intro",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="An introduction to the free lessons concept. max length 160 chars",
     )
     # Admin panel configuration
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
-                FieldPanel("jp_title"),
+                FieldPanel("ja_title"),
+                FieldPanel("short_intro"),
             ],
             heading="Lesson list page header area",
         )
@@ -43,7 +51,8 @@ class LessonListPage(HeadlessMixin, Page):
 
     # Api configuration
     api_fields = [
-        APIField("jp_title"),
+        APIField("ja_title"),
+        APIField("short_intro"),
     ]
 
     # Page limitations, Meta and methods
@@ -75,12 +84,19 @@ class LessonDetailPage(HeadlessMixin, Page):
         related_name="+",
         help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
     )
-    jp_title = models.CharField(
+    ja_title = models.CharField(
         "Japanese Title",
         blank=False,
         null=False,
-        max_length=70,
-        help_text="Required. Max length 70 characters, 60 or less is ideal",
+        max_length=50,
+        help_text="Required. Max length 50 characters, 45 or less is ideal",
+    )
+    short_intro = models.CharField(
+        "Short Intro",
+        blank=False,
+        null=False,
+        max_length=90,
+        help_text="A catchy, oneline introduction of what the lesson is about. Max length 90 chars",
     )
     published_date = models.DateTimeField(
         blank=False,
@@ -108,7 +124,8 @@ class LessonDetailPage(HeadlessMixin, Page):
         MultiFieldPanel(
             [
                 FieldPanel("header_image"),
-                FieldPanel("jp_title"),
+                FieldPanel("ja_title"),
+                FieldPanel("short_intro"),
                 FieldPanel("published_date"),
                 FieldPanel("estimated_time"),
                 FieldPanel("category"),
@@ -120,7 +137,8 @@ class LessonDetailPage(HeadlessMixin, Page):
     # Api configuration
     api_fields = [
         APIField("header_image"),
-        APIField("jp_title"),
+        APIField("ja_title"),
+        APIField("short_intro"),
         APIField("published_date"),
         APIField("estimated_time"),
         APIField("category", serializer=LessonCategoryFieldSerializer()),

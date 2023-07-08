@@ -6,6 +6,9 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.snippets.models import register_snippet
 from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.api import APIField
+from wagtail.fields import StreamField
+
+from streams import customblocks
 
 
 # Field Serializers
@@ -117,7 +120,19 @@ class LessonDetailPage(HeadlessMixin, Page):
         related_name="+",
         help_text="Please categorize the lesson",
     )
-    # Page header fields
+    # Page main content fields
+    lesson_content = StreamField(
+        [
+            ("rich_text", customblocks.CustomRichTextBlock()),
+            ("block_quote", customblocks.BlockQuoteBlock()),
+            ("full_width_img", customblocks.FullWidthImage()),
+            ("beyond_text_img", customblocks.BeyondContentWidthImage()),
+            ("text_width_img", customblocks.ContentWidthImage()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
 
     # Admin panel configuration
     content_panels = Page.content_panels + [
@@ -131,7 +146,8 @@ class LessonDetailPage(HeadlessMixin, Page):
                 FieldPanel("category"),
             ],
             heading="Lesson detail page header area",
-        )
+        ),
+        FieldPanel("lesson_content"),
     ]
 
     # Api configuration
@@ -142,6 +158,7 @@ class LessonDetailPage(HeadlessMixin, Page):
         APIField("published_date"),
         APIField("estimated_time"),
         APIField("category", serializer=LessonCategoryFieldSerializer()),
+        APIField("lesson_content"),
     ]
 
     # Page limitations, Meta and methods

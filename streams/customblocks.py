@@ -40,6 +40,24 @@ class CustomRichTextBlock(blocks.RichTextBlock):
             label = "Rich Text"
 
 
+class YoutubeBlock(blocks.StructBlock):
+    """Block to add responsive imbeded youtube video"""
+
+    src = blocks.URLBlock(
+        required=True,
+        max_length=255,
+        help_text="Get src from in the youtube embed code, include start if needed.",
+    )
+    short = blocks.BooleanBlock(
+        required=False,
+        help_text="Tick this box if the video is a short, i.e vertical format",
+    )
+    limit = blocks.BooleanBlock(
+        required=False,
+        help_text="Tick this box if you would like to limit recommended videos to this channel",
+    )
+
+
 class BlockQuoteBlock(blocks.StructBlock):
     """Block for correctly structured block quotes"""
 

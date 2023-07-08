@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             model_name="lessonlistpage",
             name="short_intro",
             field=models.CharField(
-                default="We love to help our students and community learn. These are free lessons on various language learning topics from our expert teachers. We hope it helps you",
+                default="A lesson intro here please",
                 help_text="An introduction to the free lessons concept. max length 90 chars",
                 max_length=90,
                 verbose_name="Short Intro",

@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "users",
     "home",
     "lessons",
+    "streams",
     # Rest and auth
     "rest_framework",
     "rest_framework.authtoken",

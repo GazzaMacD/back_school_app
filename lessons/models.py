@@ -129,6 +129,7 @@ class LessonDetailPage(HeadlessMixin, Page):
             ("beyond_text_img", customblocks.BeyondContentWidthImage()),
             ("text_width_img", customblocks.ContentWidthImage()),
             ("youtube", customblocks.YoutubeBlock()),
+            ("conversation", customblocks.ConversationBlock()),
         ],
         use_json_field=True,
         null=True,

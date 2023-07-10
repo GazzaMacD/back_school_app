@@ -82,6 +82,47 @@ class BlockQuoteBlock(blocks.StructBlock):
         label = "Block quotation"
 
 
+# =============== Conversation Blocks ======================
+class TwoPersonLinesBlock(blocks.StructBlock):
+    """A simple block for two peoples conversation lines"""
+
+    person_one = blocks.CharBlock(
+        max_length=255,
+    )
+    person_two = blocks.CharBlock(
+        max_length=255,
+    )
+
+    class Meta:
+        icon = "openquote"
+        label = "Lines"
+
+
+class ConversationBlock(blocks.StructBlock):
+    """A block to compose conversations between two people for educational purposes"""
+
+    title = blocks.CharBlock(
+        max_length=30,
+        help_text="A short title for the conversation. Max 30 chars",
+    )
+    intro = blocks.TextBlock(
+        help_text="Set the scene of the conversation",
+    )
+    person_one_name = blocks.CharBlock(
+        max_length=10,
+        help_text="First person in conversation name, correlates to person one in following blocks. Please use names starting with different letters. Eg. Bob for first person and Sarah for second person. B and S in this example",
+    )
+    person_two_name = blocks.CharBlock(
+        max_length=10,
+        help_text="Secon person in conversation name, correlates to person two in following blocks.",
+    )
+    conversation = blocks.ListBlock(TwoPersonLinesBlock())
+
+    class Meta:
+        icon = "group"
+        label = "Conversation"
+
+
 # =============== Image Chooser Blocks ======================
 
 # NOTE: image sizes still to be decided

@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils import timezone
 from rest_framework.fields import Field
-from wagtail.models import Page
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from modelcluster.fields import ParentalKey
+from wagtail.models import Page, Orderable
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.snippets.models import register_snippet
 from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.api import APIField
@@ -19,6 +20,25 @@ class LessonCategoryFieldSerializer(Field):
             "name": value.name,
             "ja_name": value.ja_name,
             "slug": value.slug,
+        }
+
+
+class LessonRelatedFieldSerializer(Field):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "title": value.title,
+            "ja_title": value.ja_title,
+            "short_intro": value.short_intro,
+            "slug": value.slug,
+            "image": {
+                "id": value.header_image.id,
+                "title": value.header_image.title,
+                "original": value.header_image.get_rendition("original").attrs_dict,
+                "thumbnail": value.header_image.get_rendition(
+                    "fill-960x540"
+                ).attrs_dict,
+            },
         }
 
 
@@ -151,6 +171,12 @@ class LessonDetailPage(HeadlessMixin, Page):
             heading="Lesson detail page header area",
         ),
         FieldPanel("lesson_content"),
+        MultiFieldPanel(
+            [
+                InlinePanel("related_lessons", label="Lesson", max_num=4),
+            ],
+            heading="Related Lessons",
+        ),
     ]
 
     # Api configuration
@@ -162,6 +188,7 @@ class LessonDetailPage(HeadlessMixin, Page):
         APIField("estimated_time"),
         APIField("category", serializer=LessonCategoryFieldSerializer()),
         APIField("lesson_content"),
+        APIField("related_lessons"),
     ]
 
     # Page limitations, Meta and methods
@@ -217,3 +244,23 @@ class LessonCategory(models.Model):
     class Meta:
         verbose_name = "Lesson Category"
         verbose_name_plural = "Lesson Categories"
+
+
+class RelatedLessons(Orderable):
+    """Orderable field for lessons that should be connected to this lesson"""
+
+    page = ParentalKey(
+        LessonDetailPage,
+        on_delete=models.CASCADE,
+        related_name="related_lessons",
+    )
+    lesson = models.ForeignKey("lessons.LessonDetailPage", on_delete=models.CASCADE)
+
+    panels = [FieldPanel("lesson")]
+
+    api_fields = [
+        APIField("lesson", serializer=LessonRelatedFieldSerializer()),
+    ]
+
+    def __str__(self):
+        return self.lesson.title

@@ -57,6 +57,10 @@ class YoutubeBlock(blocks.StructBlock):
         help_text="Tick this box if you would like to limit recommended videos to this channel",
     )
 
+    class Meta:
+        icon = "desktop"
+        label = "Youtube Block"
+
 
 class BlockQuoteBlock(blocks.StructBlock):
     """Block for correctly structured block quotes"""
@@ -80,6 +84,46 @@ class BlockQuoteBlock(blocks.StructBlock):
     class Meta:
         icon = "openquote"
         label = "Block quotation"
+
+
+# =============== Multiple Choice question Blocks ======================
+class MCQuestionBlock(blocks.StructBlock):
+    """A block for a single question with three possible answers, one correct and two incorrect"""
+
+    question = blocks.CharBlock(
+        max_length=255,
+    )
+    correct_answer = blocks.CharBlock(
+        max_length=50,
+    )
+    incorrect_answer1 = blocks.CharBlock(
+        max_length=50,
+    )
+    incorrect_answer2 = blocks.CharBlock(
+        max_length=50,
+    )
+
+    class Meta:
+        icon = "help"
+        label = "Multiple Choice Question"
+
+
+class MCQuestionsBlock(blocks.StructBlock):
+    """A block for a series of multiple choice questions with title and intro section"""
+
+    title = blocks.CharBlock(
+        max_length=30,
+        help_text="A short title for the series of multiple choice questions. Max 30 chars",
+    )
+    intro = blocks.TextBlock(
+        required=False,
+        help_text="More information, if required about the test series. Not required",
+    )
+    questions = blocks.ListBlock(MCQuestionBlock())
+
+    class Meta:
+        icon = "help"
+        label = "Multiple Choice Questions"
 
 
 # =============== Conversation Blocks ======================

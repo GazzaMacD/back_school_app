@@ -1,10 +1,17 @@
 from django.contrib import admin
 
-from .models import Contact
+from .models import Contact, ContactEmail
+
+
+class ContactEmailInline(admin.TabularInline):
+    model = ContactEmail
+    extra = 0
 
 
 class ContactAdmin(admin.ModelAdmin):
-    pass
+    inlines = [
+        ContactEmailInline,
+    ]
 
 
 admin.site.register(Contact, ContactAdmin)

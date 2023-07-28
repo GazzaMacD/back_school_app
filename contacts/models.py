@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
 
 from core.models import TimeStampedModel
 from users.models import CustomUser
@@ -13,6 +14,7 @@ class Contact(TimeStampedModel):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        help_text="Only connect this to user IF a site user exists. Make sure that the email used for the user is registered in Contact emails as primary. This will generally be done by the system but in case manual connection is required, you can in this interface",
     )
     name = models.CharField(
         _("name"),
@@ -28,22 +30,14 @@ class Contact(TimeStampedModel):
         max_length=100,
         help_text="Full name in English, order should be same as name. Example 田中たろ should become Tanaka Taro in the field. Max length: 100char",
     )
-    primary_email = models.EmailField(
-        _("primary email address"),
-        blank=True,
-        null=False,
-        unique=True,
-        max_length=255,
-        help_text="This email should be the same as for interacting with the site via the user model. Will be automatically updated if user changes via auth system",
-    )
 
     def __str__(self) -> str:
         if self.name:
             return self.name
-        elif self.primary_email:
-            return self.primary_email
+        elif self.user:
+            return self.user.email
         else:
-            return f"Anonymous Contact with ID: {self.pk}"
+            return f"Anon User with id: {self.id}. Add name please."
 
 
 @receiver(post_save, sender=CustomUser)
@@ -52,24 +46,72 @@ def create_or_update_contact(sender, instance, created, **kwargs):
     relate contact with same email address to new user. In case of update of user,
     check to see if mail is same as primary email of contact, if not update it to match
     """
-    qs = Contact.objects.filter(primary_email__iexact=instance.email)
-    contact = None
+    qs = ContactEmail.objects.filter(email__iexact=instance.email)
     if created:
+        # new user so find if there is a contact entry
+        # with the same email address. If so
+        # connect them, and if not create a new contact
+        # with an email registered as primary contact email
         if qs.exists():
-            contact = qs.first()
+            # contact with that email exists so conect them
+            contact = qs.first().contact
             contact.user = instance
-            return contact.save()
+            contact.save()
         else:
-            contact = Contact(user=instance, primary_email=instance.email)
-            return contact.save()
-    elif (
-        hasattr(instance, "contact")
-        and instance.email != instance.contact.primary_email
-    ):
-        # The associated user has had their email changed so update
-        # the primary_email field with the same email
-        contact = Contact.objects.get(id=instance.contact.id)
-        contact.primary_email = instance.email
-        contact.save()
+            # No contact with that email found so create new contact
+            # and new contact email with primary set as true
+            contact = Contact(user=instance)
+            contact.save()
+            email = ContactEmail(contact=contact, is_primary=True, email=instance.email)
+            email.save()
     else:
-        pass
+        # Updating a current user
+        if qs.exists():
+            connected_email = qs.first()
+            contact = connected_email.contact
+            # Set all this contacts mails is_primary to false
+            contact_emails = ContactEmail.objects.filter(contact=contact)
+            for email in contact_emails:
+                # set all connected emals to false first
+                email.is_primary = False
+                email.save()
+            # set this one to True
+            connected_email.is_primary = True
+            connected_email.save()
+        else:
+            # No email found so this must be a new email for this user
+            # Set all other addresses for this user to be False
+            contact_emails = ContactEmail.objects.filter(contact=instance.contact)
+            for email in contact_emails:
+                email.is_primary = False
+                email.save()
+            new_primary_email = ContactEmail(
+                contact=instance.contact, is_primary=True, email=instance.email
+            )
+            new_primary_email.save()
+
+
+class ContactEmail(TimeStampedModel):
+    contact = models.ForeignKey(
+        Contact,
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE,
+        related_name="contact_emails",
+    )
+    is_primary = models.BooleanField(
+        _("Is primary"),
+        blank=False,
+        null=False,
+        default=False,
+    )
+    email = models.CharField(
+        _("Email"),
+        unique=True,
+        max_length=200,
+        blank=False,
+        null=False,
+    )
+
+    def __str__(self):
+        return self.email

@@ -40,7 +40,10 @@ class Contact(TimeStampedModel):
     def __str__(self) -> str:
         if self.name:
             return self.name
-        return f"Anonymous Contact with ID: {self.pk}"
+        elif self.primary_email:
+            return self.primary_email
+        else:
+            return f"Anonymous Contact with ID: {self.pk}"
 
 
 @receiver(post_save, sender=CustomUser)

@@ -33,10 +33,11 @@ class ContactEmailInline(admin.TabularInline):
     formset = ContactEmailInlineFormSet
 
 
-class NoteInline(admin.StackedInline):
+class NoteInline(admin.TabularInline):
     model = Note
     extra = 0
     ordering = ["-created"]
+    classes = ["collapse"]
 
 
 class ContactAdmin(admin.ModelAdmin):

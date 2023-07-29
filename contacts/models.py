@@ -151,4 +151,4 @@ class Note(TimeStampedModel):
     )
 
     def __str__(self) -> str:
-        return f"Note: {self.note_type.label} : {self.title}"
+        return self.title

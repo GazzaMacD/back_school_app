@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 
-from .models import Contact, ContactEmail
+from .models import Contact, ContactEmail, Note
 
 
 class ContactEmailInlineFormSet(BaseInlineFormSet):
@@ -33,9 +33,16 @@ class ContactEmailInline(admin.TabularInline):
     formset = ContactEmailInlineFormSet
 
 
+class NoteInline(admin.StackedInline):
+    model = Note
+    extra = 0
+    ordering = ["-created"]
+
+
 class ContactAdmin(admin.ModelAdmin):
     inlines = [
         ContactEmailInline,
+        NoteInline,
     ]
 
 

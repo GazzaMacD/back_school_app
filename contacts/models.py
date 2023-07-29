@@ -123,7 +123,7 @@ class NoteTypeChoices(models.IntegerChoices):
     EMAIL = 1, "Email"
 
 
-class Notes(TimeStampedModel):
+class Note(TimeStampedModel):
     contact = models.ForeignKey(
         Contact,
         null=False,
@@ -149,3 +149,6 @@ class Notes(TimeStampedModel):
         null=False,
         blank=False,
     )
+
+    def __str__(self) -> str:
+        return f"Note: {self.note_type.label} : {self.title}"

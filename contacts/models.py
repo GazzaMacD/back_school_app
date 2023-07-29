@@ -115,3 +115,40 @@ class ContactEmail(TimeStampedModel):
 
     def __str__(self):
         return self.email
+
+
+# ============= Notes ============
+class NoteTypeChoices(models.IntegerChoices):
+    REGULAR = 0, "Regular"
+    EMAIL = 1, "Email"
+
+
+class Note(TimeStampedModel):
+    contact = models.ForeignKey(
+        Contact,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name="contact_notes",
+    )
+    title = models.CharField(
+        _("title"),
+        null=False,
+        blank=False,
+        max_length=50,
+    )
+    note_type = models.IntegerField(
+        _("note type"),
+        null=False,
+        blank=False,
+        default=NoteTypeChoices.REGULAR,
+        choices=NoteTypeChoices.choices,
+    )
+    note = models.TextField(
+        _("note"),
+        null=False,
+        blank=False,
+    )
+
+    def __str__(self) -> str:
+        return self.title

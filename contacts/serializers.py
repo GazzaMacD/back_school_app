@@ -12,6 +12,10 @@ class ContactUserSerializer(serializers.ModelSerializer):
 # Contact Form Serializers
 
 
+class ContactFormEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, allow_blank=False, max_length=200)
+
+
 class ContactFormContactEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactEmail
@@ -48,3 +52,18 @@ class ContactFormSerializer(serializers.ModelSerializer):
             note_dict["title"] = f"Email from {contact_email}"
             Note.objects.create(contact=contact, **note_dict)
         return contact
+
+    def update(self, instance, validated_data):
+        email_data = validated_data.pop("contact_emails")
+        note_data = validated_data.pop("contact_notes")
+        contact_email = None
+        for email in email_data:
+            email_dict = dict(email)
+            contact_email = email_dict["email"]
+            contact_email = contact_email[6:]  # remove 'REMOVE"
+        for note in note_data:
+            note_dict = dict(note)
+            note_dict["note_type"] = 1
+            note_dict["title"] = f"Email from {contact_email}"
+            Note.objects.create(contact=instance, **note_dict)
+        return instance

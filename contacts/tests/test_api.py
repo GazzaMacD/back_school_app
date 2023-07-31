@@ -93,3 +93,11 @@ class ContactFormTests(APITestCase):
             json.dumps(response.data),
             json.dumps({"contact_notes": [{"note": ["This field may not be blank."]}]}),
         )
+
+    def test_ip_block(self):
+        """
+        Ensure if ip address not in safe ips, blocked and no contact created.
+        """
+        response = self.client.post(URL, DATA, REMOTE_ADDR="10.82.6.98")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(Contact.objects.count(), 0)

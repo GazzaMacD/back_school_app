@@ -203,6 +203,10 @@ WAGTAILSEARCH_BACKENDS = {
 }
 
 # DRF Settings
+SAFE_IPS = [
+    "127.0.0.1",
+]
+
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",

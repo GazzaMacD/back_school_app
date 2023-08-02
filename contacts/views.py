@@ -48,7 +48,7 @@ class ContactFormView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 # NOTE send alert email here
-                return Response({"message": "ok"}, status=status.HTTP_201_CREATED)
+                return Response({"details": "ok"}, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
@@ -60,5 +60,5 @@ class ContactFormView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 # NOTE send alert email here
-                return Response({"message": "ok"})
+                return Response({"details": "ok"})
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

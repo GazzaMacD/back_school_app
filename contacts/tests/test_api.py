@@ -53,7 +53,7 @@ class ContactFormTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.post(URL, DATA2)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"message": "ok"})
+        self.assertEqual(response.data, {"details": "ok"})
         self.assertEqual(Contact.objects.count(), 1)
         contact = Contact.objects.get(pk=1)
         self.assertEqual(Note.objects.count(), 2)

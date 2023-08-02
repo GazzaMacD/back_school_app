@@ -34,7 +34,7 @@ class ContactFormSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        fields = ("name", "contact_emails", "contact_notes")
+        fields = ("name", "name_en", "contact_emails", "contact_notes")
 
     def create(self, validated_data):
         email_data = validated_data.pop("contact_emails")

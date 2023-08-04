@@ -2,12 +2,101 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.exceptions import ObjectDoesNotExist
+from wagtail_headless_preview.models import HeadlessMixin
+from wagtail.models import Page
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from wagtail.fields import StreamField
+from wagtail.api import APIField
 
 from core.models import TimeStampedModel
 from users.models import CustomUser
+from streams import customblocks
 
 
+# ======== Contact Page ==========
+class ContactPage(HeadlessMixin, Page):
+    """Page for contact information as well as joining process"""
+
+    ja_title = models.CharField(
+        "Japanese Title",
+        blank=False,
+        null=False,
+        max_length=15,
+        help_text="Required. Max length 15 characters.",
+    )
+    short_intro = models.CharField(
+        "Short Intro",
+        blank=False,
+        null=False,
+        max_length=90,
+        help_text="A  oneline introduction of what this page is about. Max length 90 chars",
+    )
+    assessment_trial = StreamField(
+        [
+            ("rich_text", customblocks.CustomRichTextBlock()),
+            ("youtube", customblocks.YoutubeBlock()),
+            ("info_cards", customblocks.InfoCardSeriesBlock()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
+    join_experience = StreamField(
+        [
+            ("rich_text", customblocks.CustomRichTextBlock()),
+            ("youtube", customblocks.YoutubeBlock()),
+            ("info_cards", customblocks.InfoCardSeriesBlock()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
+    question_and_answer = StreamField(
+        [
+            ("q_and_a", customblocks.QuestionAnswerSeriesBlock()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
+
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("ja_title"),
+                FieldPanel("short_intro"),
+            ],
+            heading="Contact page header area",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("assessment_trial"),
+                FieldPanel("join_experience"),
+                FieldPanel("question_and_answer"),
+            ],
+            heading="Contact page info section",
+        ),
+    ]
+
+    # Api configuration
+    api_fields = [
+        APIField("ja_title"),
+        APIField("short_intro"),
+        APIField("assessment_trial"),
+        APIField("join_experience"),
+        APIField("question_and_answer"),
+    ]
+
+    max_count = 1
+    parent_page_types = [
+        "home.HomePage",
+    ]
+
+    def __str__(self):
+        return self.title
+
+
+# ======== Contact Model and associated models and logic ==========
 class Contact(TimeStampedModel):
     user = models.OneToOneField(
         CustomUser,

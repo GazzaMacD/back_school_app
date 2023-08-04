@@ -36,7 +36,7 @@ class LessonRelatedFieldSerializer(Field):
                 "title": value.header_image.title,
                 "original": value.header_image.get_rendition("original").attrs_dict,
                 "thumbnail": value.header_image.get_rendition(
-                    "fill-960x540"
+                    "fill-560x350"
                 ).attrs_dict,
             },
         }

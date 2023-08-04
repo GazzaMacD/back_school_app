@@ -4,7 +4,7 @@ from wagtail.images.blocks import ImageChooserBlock
 
 
 class CustomImageChooserBlock(ImageChooserBlock):
-    """Customize api json response to include url string to image and thumbnail"""
+    """Customize api json response to include url string to image and thumbnail. Images are of 16/10 aspect ratio except one of 16/9"""
 
     def get_api_representation(self, value, context=None):
         if value:
@@ -12,7 +12,9 @@ class CustomImageChooserBlock(ImageChooserBlock):
                 "id": value.id,
                 "title": value.title,
                 "original": value.get_rendition("original").attrs_dict,
-                "thumbnail": value.get_rendition("fill-240x240").attrs_dict,
+                "medium": value.get_rendition("fill-1024x640").attrs_dict,
+                "16/9": value.get_rendition("fill-1024x576").attrs_dict,
+                "thumbnail": value.get_rendition("fill-560x350").attrs_dict,
             }
 
 
@@ -126,6 +128,55 @@ class MCQuestionsBlock(blocks.StructBlock):
         label = "Multiple Choice Questions"
 
 
+# =============== Question and Answer Blocks ======================
+
+
+class QuestionAnswerBlock(blocks.StructBlock):
+    """A simple question and answer block"""
+
+    question = blocks.CharBlock(
+        required=True,
+        max_length=255,
+        help_text="Your question here. Max length 255",
+    )
+    answer = blocks.TextBlock(
+        required=True,
+        help_text="The answer to your question here.",
+    )
+
+
+class QuestionAnswerSeriesBlock(blocks.StructBlock):
+    """A series of question and answers"""
+
+    q_and_a_series = blocks.ListBlock(QuestionAnswerBlock())
+
+
+# =============== Information Card Blocks ======================
+class InfoCardBlock(blocks.StructBlock):
+    """A block for card with title, image and text"""
+
+    title = blocks.CharBlock(
+        required=True,
+        max_length=20,
+        help_text="Title for card. Max length 20",
+    )
+    image = CustomImageChooserBlock(
+        required=True,
+        help_text="Image size: 2048px x 1280px (16/10 ratio). Please optimize image size before uploading.",
+    )
+    text = blocks.TextBlock(
+        required=True,
+        max_length=100,
+        help_text="Text for card. Max length 100",
+    )
+
+
+class InfoCardSeriesBlock(blocks.StructBlock):
+    """A block for a series of cards"""
+
+    cards = blocks.ListBlock(InfoCardBlock())
+
+
 # =============== Conversation Blocks ======================
 class TwoPersonLinesBlock(blocks.StructBlock):
     """A simple block for two peoples conversation lines"""
@@ -177,7 +228,7 @@ class FullWidthImage(blocks.StructBlock):
 
     image = CustomImageChooserBlock(
         required=True,
-        help_text="Full width at large screen size. Use an image NOTE: TO BE DECIDED***",
+        help_text="Full width at large screen size. Image size: 2048px x 1280px (16/10 ratio)",
     )
     caption = blocks.CharBlock(
         max_length=200,
@@ -216,7 +267,7 @@ class BeyondContentWidthImage(blocks.StructBlock):
 
     image = CustomImageChooserBlock(
         required=True,
-        help_text="Image will extend beyond text content width at large screen size. Use an image **TO BE DECIDED***",
+        help_text="Image will extend beyond text content width at large screen size. Image size: 2048px x 1280px (16/10 ratio)",
     )
     caption = blocks.CharBlock(
         max_length=200,
@@ -254,7 +305,7 @@ class ContentWidthImage(blocks.StructBlock):
 
     image = CustomImageChooserBlock(
         required=True,
-        help_text="Image will extend beyond text content width at large screen size. Use an image **TO BE DECIDED***",
+        help_text="Image will extend beyond text content width at large screen size. Image size: 2048px x 1280px (16/10 ratio)  ",
     )
     caption = blocks.CharBlock(
         max_length=200,

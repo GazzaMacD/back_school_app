@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "streams",
     "contacts",
     "core",
+    "addresses",
     # Rest and auth
     "rest_framework",
     "rest_framework.authtoken",

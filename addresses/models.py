@@ -268,48 +268,47 @@ class CountryChoices(models.TextChoices):
 
 
 class Address(TimeStampedModel):
-    contact = models.ForeignKey(
-        Contact,
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="contact_addresses",
-    )
-    is_primary = models.BooleanField(
-        _("Is primary"),
-        blank=False,
+    name = models.CharField(
+        _("Name"),
         null=False,
-        default=False,
+        blank=True,
+        max_length=255,
+        help_text="Name but not required",
     )
     line_one = models.CharField(
         _("line one"),
         null=False,
         blank=False,
         max_length=255,
+        help_text="Required",
     )
     line_two = models.CharField(
         _("line two"),
         null=False,
         blank=True,
         max_length=255,
+        help_text="Not required",
     )
     city_town_village = models.CharField(
         _("city town or village"),
         null=False,
         blank=False,
         max_length=255,
+        help_text="Required",
     )
     prefecture_state = models.CharField(
         _("prefecture or state"),
         null=False,
         blank=True,
         max_length=100,
+        help_text="Not required but preferable if available",
     )
     postal_code = models.CharField(
         _("post code or zip code"),
         null=False,
         blank=True,
         max_length=100,
+        help_text="Not required but preferable if available",
     )
     country = models.CharField(
         _("country"),
@@ -318,4 +317,45 @@ class Address(TimeStampedModel):
         max_length=3,
         choices=CountryChoices.choices,
         default=CountryChoices.JAPAN,
+        help_text="Required",
+    )
+
+    def __str__(self) -> str:
+        if self.name:
+            return self.name
+        return self.line_one
+
+
+# ============= /* Intermediary Models */==================
+
+
+class AddressTypeChoices(models.TextChoices):
+    HOME = "HOM", _("Home")
+    WORK = "WRK", _("Work")
+    HEAD_OFFICE = "HOF", _("Head Office")
+    BRANCH_OFFICE = "BRO", _("Branch Office")
+
+
+class ContactAddress(models.Model):
+    contact = models.ForeignKey(
+        Contact,
+        on_delete=models.CASCADE,
+    )
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.CASCADE,
+    )
+    contact_type = models.CharField(
+        _("Contact type"),
+        null=False,
+        blank=False,
+        choices=AddressTypeChoices.choices,
+        default=AddressTypeChoices.HOME,
+        max_length=3,
+    )
+    is_primary = models.BooleanField(
+        _("Is primary"),
+        blank=False,
+        null=False,
+        default=False,
     )

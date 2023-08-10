@@ -3,7 +3,7 @@ from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 
 from .models import Contact, ContactEmail, Note
-from addresses.models import Address
+from addresses.admin import ContactAddressInline
 
 
 class ContactEmailInlineFormSet(BaseInlineFormSet):
@@ -32,6 +32,7 @@ class ContactEmailInline(admin.TabularInline):
     model = ContactEmail
     extra = 0
     formset = ContactEmailInlineFormSet
+    classes = ["collapse"]
 
 
 class NoteInline(admin.TabularInline):
@@ -41,17 +42,10 @@ class NoteInline(admin.TabularInline):
     classes = ["collapse"]
 
 
-class AddressInline(admin.StackedInline):
-    model = Address
-    extra = 0
-    ordering = ["-created"]
-    classes = ["collapse"]
-
-
 class ContactAdmin(admin.ModelAdmin):
     inlines = [
         ContactEmailInline,
-        AddressInline,
+        ContactAddressInline,
         NoteInline,
     ]
 

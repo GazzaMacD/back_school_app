@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "contacts",
     "core",
     "addresses",
+    "telnumbers",
     # Rest and auth
     "rest_framework",
     "rest_framework.authtoken",

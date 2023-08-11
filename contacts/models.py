@@ -97,6 +97,8 @@ class ContactPage(HeadlessMixin, Page):
 
 
 # ======== Contact Model and associated models and logic ==========
+
+
 class Contact(TimeStampedModel):
     user = models.OneToOneField(
         CustomUser,

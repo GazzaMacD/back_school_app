@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 
 from .models import Contact, ContactEmail, Note
 from addresses.admin import ContactAddressInline
+from telnumbers.admin import TelNumberInline
 
 
 class ContactEmailInlineFormSet(BaseInlineFormSet):
@@ -45,6 +46,7 @@ class NoteInline(admin.TabularInline):
 class ContactAdmin(admin.ModelAdmin):
     inlines = [
         ContactEmailInline,
+        TelNumberInline,
         ContactAddressInline,
         NoteInline,
     ]

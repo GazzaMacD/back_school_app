@@ -18,6 +18,13 @@ class TelNumber(TimeStampedModel):
         null=True,
         blank=True,
     )
+    identifier = models.CharField(
+        _("Easy Identifier"),
+        null=False,
+        blank=True,
+        max_length=150,
+        help_text=_("Not required, max 150 char"),
+    )
     number = models.CharField(
         _("Telephone Number"),
         null=False,
@@ -43,4 +50,6 @@ class TelNumber(TimeStampedModel):
     )
 
     def __str__(self) -> str:
+        if self.identifier:
+            return f"{self.identifier} - {self.number}"
         return self.number

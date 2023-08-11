@@ -97,6 +97,8 @@ class ContactPage(HeadlessMixin, Page):
 
 
 # ======== Contact Model and associated models and logic ==========
+
+
 class Contact(TimeStampedModel):
     user = models.OneToOneField(
         CustomUser,
@@ -119,9 +121,13 @@ class Contact(TimeStampedModel):
         max_length=100,
         help_text="Full name in English, order should be same as name. Example 田中たろ should become Tanaka Taro in the field. Max length: 100char",
     )
+    addresses = models.ManyToManyField(
+        "addresses.Address",
+        through="addresses.ContactAddress",
+    )
 
     def __str__(self) -> str:
-        if self.name:
+        if self.name:  # type: ignore
             return self.name
         elif self.user:
             return self.user.email

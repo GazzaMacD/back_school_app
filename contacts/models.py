@@ -105,6 +105,11 @@ class StatusChoices(models.IntegerChoices):
     STAFF = 4, _("Staff Member")
 
 
+class IndOrOrgChoices(models.IntegerChoices):
+    INDIVIDUAL = 0, _("Individual")
+    ORGANIZATION = 1, _("Organization")
+
+
 class Contact(TimeStampedModel):
     user = models.OneToOneField(
         CustomUser,
@@ -133,6 +138,14 @@ class Contact(TimeStampedModel):
         blank=False,
         choices=StatusChoices.choices,
         default=StatusChoices.LEAD,
+        help_text="Required",
+    )
+    ind_or_org = models.PositiveSmallIntegerField(
+        _("Individual or Organization"),
+        null=False,
+        blank=False,
+        choices=IndOrOrgChoices.choices,
+        default=IndOrOrgChoices.INDIVIDUAL,
         help_text="Required",
     )
     addresses = models.ManyToManyField(

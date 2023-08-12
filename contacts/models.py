@@ -97,6 +97,12 @@ class ContactPage(HeadlessMixin, Page):
 
 
 # ======== Contact Model and associated models and logic ==========
+class StatusChoices(models.IntegerChoices):
+    LEAD = 0, _("Lead")
+    ACTIVE_CUSTOMER = 1, _("Active Customer")
+    INACTIVE_CUSTOMER = 2, _("Inactive Customer")
+    BUSINESS_PARTNER = 3, _("Business Partner")
+    STAFF = 4, _("Staff Member")
 
 
 class Contact(TimeStampedModel):
@@ -120,6 +126,14 @@ class Contact(TimeStampedModel):
         null=False,
         max_length=100,
         help_text="Full name in English, order should be same as name. Example 田中たろ should become Tanaka Taro in the field. Max length: 100char",
+    )
+    status = models.PositiveSmallIntegerField(
+        _("Status"),
+        null=False,
+        blank=False,
+        choices=StatusChoices.choices,
+        default=StatusChoices.LEAD,
+        help_text="Required",
     )
     addresses = models.ManyToManyField(
         "addresses.Address",

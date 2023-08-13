@@ -56,6 +56,7 @@ class OrganizationInline(admin.TabularInline):
         "name",
         "name_en",
         "status",
+        "gender",
     ]
     verbose_name = "Organization Contacts"
     verbose_name_plural = "Organization Contacts"

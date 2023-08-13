@@ -110,6 +110,13 @@ class IndOrOrgChoices(models.IntegerChoices):
     ORGANIZATION = 1, _("Organization")
 
 
+class GenderChoices(models.IntegerChoices):
+    MALE = 0, _("Male")
+    FEMALE = 1, _("Female")
+    OTHER = 2, _("Other")
+    NA = 3, _("Not Applicable")
+
+
 class Contact(TimeStampedModel):
     user = models.OneToOneField(
         CustomUser,
@@ -146,6 +153,14 @@ class Contact(TimeStampedModel):
         blank=False,
         choices=IndOrOrgChoices.choices,
         default=IndOrOrgChoices.INDIVIDUAL,
+        help_text="Required",
+    )
+    gender = models.PositiveSmallIntegerField(
+        _("Gender"),
+        null=False,
+        blank=False,
+        choices=GenderChoices.choices,
+        default=GenderChoices.NA,
         help_text="Required",
     )
     organization = models.ForeignKey(

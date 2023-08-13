@@ -50,6 +50,12 @@ class OrganizationInline(admin.TabularInline):
     extra = 0
     exclude = [
         "user",
+        "ind_or_org",
+    ]
+    readonly_fields = [
+        "name",
+        "name_en",
+        "status",
     ]
     verbose_name = "Organization Contacts"
     verbose_name_plural = "Organization Contacts"

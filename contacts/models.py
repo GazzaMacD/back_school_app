@@ -148,6 +148,15 @@ class Contact(TimeStampedModel):
         default=IndOrOrgChoices.INDIVIDUAL,
         help_text="Required",
     )
+    organization = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        limit_choices_to={"ind_or_org": 1},
+        related_name="staff_members",
+        null=True,
+        blank=True,
+        help_text="Not required",
+    )
     addresses = models.ManyToManyField(
         "addresses.Address",
         through="addresses.ContactAddress",

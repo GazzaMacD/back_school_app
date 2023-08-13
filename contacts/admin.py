@@ -43,12 +43,33 @@ class NoteInline(admin.TabularInline):
     classes = ["collapse"]
 
 
+class OrganizationInline(admin.TabularInline):
+    model = Contact
+    fk_name = "organization"
+    can_delete = False
+    extra = 0
+    exclude = [
+        "user",
+        "ind_or_org",
+    ]
+    readonly_fields = [
+        "name",
+        "name_en",
+        "status",
+    ]
+    verbose_name = "Organization Contacts"
+    verbose_name_plural = "Organization Contacts"
+    classes = ["collapse"]
+
+
 class ContactAdmin(admin.ModelAdmin):
+    list_display = ("name_en", "name", "user", "status", "organization")
     inlines = [
         ContactEmailInline,
         TelNumberInline,
         ContactAddressInline,
         NoteInline,
+        OrganizationInline,
     ]
 
 

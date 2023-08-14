@@ -172,6 +172,14 @@ class Contact(TimeStampedModel):
         blank=True,
         help_text="Not required",
     )
+    child_of = models.ManyToManyField(
+        "self",
+        blank=True,
+        limit_choices_to={"ind_or_org": 0},
+        related_name="guardian_of",
+        symmetrical=False,
+        help_text="Not required",
+    )
     addresses = models.ManyToManyField(
         "addresses.Address",
         through="addresses.ContactAddress",

@@ -65,12 +65,41 @@ class OrganizationInline(admin.TabularInline):
 
 class ContactAdmin(admin.ModelAdmin):
     list_display = ("name_en", "name", "user", "status", "organization")
+    fieldsets = [
+        (
+            "Basic information",
+            {
+                "fields": [
+                    "user",
+                    "name",
+                    "name_en",
+                    "gender",
+                    "status",
+                    "ind_or_org",
+                    "organization",
+                ],
+            },
+        ),
+        (
+            "IF CHilD WITH PARENTS",
+            {
+                "classes": [
+                    "collapse",
+                ],
+                "fields": [
+                    "child_of",
+                ],
+            },
+        ),
+    ]
+    exclude = ("child_of",)
+
     inlines = [
         ContactEmailInline,
         TelNumberInline,
         ContactAddressInline,
-        NoteInline,
         OrganizationInline,
+        NoteInline,
     ]
 
 

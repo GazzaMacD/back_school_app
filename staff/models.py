@@ -111,6 +111,13 @@ class StaffDetailPage(HeadlessMixin, Page):
         related_name="+",
         help_text="Image size: 1080px x 1080px. Please optimize image size before uploading.",
     )
+    role = models.CharField(
+        "Roles in company",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 chars",
+    )
     country = models.CharField(
         "Country",
         blank=False,
@@ -124,6 +131,13 @@ class StaffDetailPage(HeadlessMixin, Page):
         blank=False,
         null=False,
         help_text="Required.",
+    )
+    hobbies = models.CharField(
+        "Hobbies",
+        blank=False,
+        null=False,
+        max_length=255,
+        help_text="Required. Comma separated list of hobbies. Max length 255 chars",
     )
     interview = StreamField(
         [
@@ -141,9 +155,11 @@ class StaffDetailPage(HeadlessMixin, Page):
             [
                 FieldPanel("member"),
                 FieldPanel("profile_image"),
+                FieldPanel("role"),
                 FieldPanel("country"),
                 FieldPanel("native_language"),
                 InlinePanel("languages_spoken", label="Languages Spoken"),
+                FieldPanel("hobbies"),
             ],
             heading="Member details",
         ),
@@ -159,9 +175,11 @@ class StaffDetailPage(HeadlessMixin, Page):
     api_fields = [
         APIField("member", serializer=MemberFieldSerializer()),
         APIField("profile_image", serializer=StaffProfileImageSerializer()),
+        APIField("role"),
         APIField("country"),
         APIField("native_language", serializer=LanguageSerializer()),
         APIField("languages_spoken"),
+        APIField("hobbies"),
         APIField("interview"),
     ]
 

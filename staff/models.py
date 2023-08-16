@@ -37,7 +37,7 @@ class LanguageSerializer(Field):
 
 # ======== Page models ==========
 class StaffListPage(HeadlessMixin, Page):
-    """Page for to all staff and collaborators"""
+    """Page to list all staff and collaborators"""
 
     # Fields
     ja_title = models.CharField(

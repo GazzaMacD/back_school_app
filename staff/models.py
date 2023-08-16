@@ -35,6 +35,16 @@ class LanguageSerializer(Field):
         }
 
 
+class StaffProfileImageSerializer(Field):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "title": value.title,
+            "original": value.get_rendition("original").attrs_dict,
+            "thumbnail": value.get_rendition("fill-400x400").attrs_dict,
+        }
+
+
 # ======== Page models ==========
 class StaffListPage(HeadlessMixin, Page):
     """Page to list all staff and collaborators"""
@@ -99,7 +109,7 @@ class StaffDetailPage(HeadlessMixin, Page):
         blank=False,
         null=True,
         related_name="+",
-        help_text="Image size: 1000px x 1000px. Please optimize image size before uploading.",
+        help_text="Image size: 1080px x 1080px. Please optimize image size before uploading.",
     )
     country = models.CharField(
         "Country",
@@ -148,7 +158,7 @@ class StaffDetailPage(HeadlessMixin, Page):
     # Api
     api_fields = [
         APIField("member", serializer=MemberFieldSerializer()),
-        APIField("profile_image"),
+        APIField("profile_image", serializer=StaffProfileImageSerializer()),
         APIField("country"),
         APIField("native_language", serializer=LanguageSerializer()),
         APIField("languages_spoken"),

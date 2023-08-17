@@ -13,6 +13,23 @@ from streams import customblocks
 
 
 # Field Serializers
+class LessonAuthorFieldSerializer(Field):
+    def to_representation(self, value):
+        profile_image = value.profile_image
+        return {
+            "id": value.id,
+            "title": value.title,
+            "slug": value.slug,
+            "name": value.member.contact.name,
+            "image": {
+                "id": profile_image.id,
+                "title": profile_image.title,
+                "original": profile_image.get_rendition("original").attrs_dict,
+                "thumbnail": profile_image.get_rendition("fill-400x400").attrs_dict,
+            },
+        }
+
+
 class LessonCategoryFieldSerializer(Field):
     def to_representation(self, value):
         return {
@@ -25,6 +42,7 @@ class LessonCategoryFieldSerializer(Field):
 
 class LessonRelatedFieldSerializer(Field):
     def to_representation(self, value):
+        image = value.header_image
         return {
             "id": value.id,
             "title": value.title,
@@ -32,12 +50,10 @@ class LessonRelatedFieldSerializer(Field):
             "short_intro": value.short_intro,
             "slug": value.slug,
             "image": {
-                "id": value.header_image.id,
-                "title": value.header_image.title,
-                "original": value.header_image.get_rendition("original").attrs_dict,
-                "thumbnail": value.header_image.get_rendition(
-                    "fill-560x350"
-                ).attrs_dict,
+                "id": image.id,
+                "title": image.title,
+                "original": image.get_rendition("original").attrs_dict,
+                "thumbnail": image.get_rendition("fill-560x350").attrs_dict,
             },
         }
 
@@ -107,6 +123,14 @@ class LessonDetailPage(HeadlessMixin, Page):
         related_name="+",
         help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
     )
+    author = models.ForeignKey(
+        "staff.StaffDetailPage",
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+        related_name="lessons",
+        help_text="Author of this lesson",
+    )
     ja_title = models.CharField(
         "Japanese Title",
         blank=False,
@@ -162,6 +186,7 @@ class LessonDetailPage(HeadlessMixin, Page):
         MultiFieldPanel(
             [
                 FieldPanel("header_image"),
+                FieldPanel("author"),
                 FieldPanel("ja_title"),
                 FieldPanel("short_intro"),
                 FieldPanel("published_date"),
@@ -182,6 +207,7 @@ class LessonDetailPage(HeadlessMixin, Page):
     # Api configuration
     api_fields = [
         APIField("header_image"),
+        APIField("author", serializer=LessonAuthorFieldSerializer()),
         APIField("ja_title"),
         APIField("short_intro"),
         APIField("published_date"),

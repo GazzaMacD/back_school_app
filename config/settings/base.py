@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "streams",
     "contacts",
     "core",
+    "courses",
     "addresses",
     "telnumbers",
     "staff",

@@ -1,11 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
+from modelcluster.fields import ParentalKey
 from wagtail.models import Page, Orderable
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.api import APIField
 from wagtail.snippets.models import register_snippet
 from rest_framework.fields import Field
-from django.utils.text import slugify
+from wagtail.fields import StreamField
 
 from core.models import (
     TimeStampedModel,
@@ -13,6 +15,7 @@ from core.models import (
     LevelChoices,
     CourseCategoryChoices,
 )
+from streams import customblocks
 
 COURSE_CHOICES_DICT = dict(CourseCategoryChoices.choices)
 LEVEL_CHOICES_DICT = dict(LevelChoices.choices)
@@ -41,6 +44,26 @@ class LevelFieldsSerializer(Field):
         return {
             "level_number": value,
             "level_display": LEVEL_CHOICES_DICT[value],
+        }
+
+
+class CourseRelatedFieldSerializer(Field):
+    def to_representation(self, value):
+        image = value.header_image
+        return {
+            "id": value.id,
+            "title": value.title,
+            "display_title": value.display_title,
+            "short_intro": value.short_intro,
+            "slug": value.slug,
+            "subject": value.subject,
+            "subject_display": value.subject_display,
+            "image": {
+                "id": image.id,
+                "title": image.title,
+                "original": image.get_rendition("original").attrs_dict,
+                "thumbnail": image.get_rendition("fill-560x350").attrs_dict,
+            },
         }
 
 
@@ -128,6 +151,21 @@ class CourseDisplayDetailPage(Page):
         related_name="course_detail_page",
         help_text="The associated course",
     )
+    header_image = models.ForeignKey(
+        "wagtailimages.Image",
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+        related_name="+",
+        help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
+    )
+    display_intro = models.TextField(
+        "Display Introduction",
+        blank=False,
+        null=False,
+        max_length=150,
+        help_text="Required. Max length 150.",
+    )
     subject_slug = models.SlugField(
         "Subect Slug",
         blank=True,
@@ -157,6 +195,25 @@ class CourseDisplayDetailPage(Page):
         choices=LevelChoices.choices,
         help_text="Starting level. If no 'to level' then please mark 'to level' as None.",
     )
+    # Page content section fields
+    course_content_points = StreamField(
+        [
+            ("listblock", customblocks.ListBlock()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
+    course_description = StreamField(
+        [
+            ("rich_text", customblocks.CustomRichTextBlock()),
+            ("text_width_img", customblocks.ContentWidthImage()),
+            ("youtube", customblocks.YoutubeBlock()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
 
     # Admin panel configuration
     content_panels = Page.content_panels + [
@@ -164,12 +221,32 @@ class CourseDisplayDetailPage(Page):
             [
                 FieldPanel("display_title"),
                 FieldPanel("course"),
+                FieldPanel("header_image"),
                 FieldPanel("subject_slug", read_only=True),
+                FieldPanel("display_intro"),
                 FieldPanel("course_category"),
                 FieldPanel("level_from"),
                 FieldPanel("level_to"),
             ],
             heading="Course header section",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("course_content_points"),
+            ],
+            heading="Course Content Points",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("course_description"),
+            ],
+            heading="Course Description",
+        ),
+        MultiFieldPanel(
+            [
+                InlinePanel("related_courses", label="Course", max_num=4),
+            ],
+            heading="Related Courses",
         ),
     ]
 
@@ -177,10 +254,15 @@ class CourseDisplayDetailPage(Page):
     api_fields = [
         APIField("display_title"),
         APIField("course", serializer=CourseFieldSerializer()),
+        APIField("header_image"),
         APIField("subject_slug"),
+        APIField("display_intro"),
         APIField("course_category", serializer=CourseCategoryFieldSerializer()),
         APIField("level_from", serializer=LevelFieldsSerializer()),
         APIField("level_to", serializer=LevelFieldsSerializer()),
+        APIField("course_content_points"),
+        APIField("course_description"),
+        APIField("related_courses"),
     ]
 
     # Page limitations, Meta and methods
@@ -214,3 +296,28 @@ class CourseDisplayDetailPage(Page):
 CourseDisplayDetailPage._meta.get_field(
     "title"
 ).help_text = "The title should match the linked 'course' field title. If it doesn't it will be replaced."
+
+
+class RelatedCourse(Orderable):
+    """Orderable field for other courses that may be connected to this course"""
+
+    page = ParentalKey(
+        CourseDisplayDetailPage,
+        on_delete=models.CASCADE,
+        related_name="related_courses",
+    )
+    course = models.ForeignKey(
+        "courses.CourseDisplayDetailPage",
+        on_delete=models.CASCADE,
+    )
+
+    panels = [
+        FieldPanel("course"),
+    ]
+
+    api_fields = [
+        APIField("course", serializer=CourseRelatedFieldSerializer()),
+    ]
+
+    def __str__(self):
+        return self.course.title

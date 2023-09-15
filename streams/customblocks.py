@@ -88,6 +88,32 @@ class BlockQuoteBlock(blocks.StructBlock):
         label = "Block quotation"
 
 
+# =============== List Blocks ======================
+class ListItemBlock(blocks.StructBlock):
+    """A block for a single list item"""
+
+    list_item = blocks.CharBlock(
+        max_length=30,
+        help_text="Max length 30chars.",
+    )
+
+    class Meta:
+        icon = "info-circle"
+        label = "List Item"
+
+
+class ListBlock(blocks.StructBlock):
+    """A block for a list, could be numbered or unumbered, depending on target usage"""
+
+    liste = blocks.ListBlock(
+        ListItemBlock(),
+    )
+
+    class Meta:
+        icon = "list-ul"
+        label = "List Block"
+
+
 # =============== Multiple Choice question Blocks ======================
 class MCQuestionBlock(blocks.StructBlock):
     """A block for a single question with three possible answers, one correct and two incorrect"""

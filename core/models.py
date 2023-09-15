@@ -64,3 +64,41 @@ class Language(models.Model):
     class Meta:
         verbose_name = "Language"
         verbose_name_plural = "Languages"
+
+
+class SubjectChoices(models.TextChoices):
+    """Text choices fields for all subjects. Currently using comma split values so as to
+    speed up queries rather than using a foreign key relation to subject model. May change in future. First value is roughly based on ISO 639-1 codes. May develop own code system if subjects go beyond language.
+    """
+
+    ENGLISH = "english", "en,English,英語"
+    JAPANESE = "japanese", "ja,Japanese,日本語"
+    FRENCH = "french", "fr,French,フランス語"
+
+
+class LevelChoices(models.IntegerChoices):
+    """Integer choices for all levels of various courses"""
+
+    NONE = 0, "None,ない"
+    ALL = 1, "All,全級"
+    ELEMENTARY = 2, "Elementary,初級"
+    LOWER_INTERMEDIATE = 3, "Lower Intermediate, 中初級"
+    INTERMEDIATE = 4, "Intermediate,中級 "
+    UPPER_INTERMEDIATE = 5, "Upper Intermediate,中上級"
+    ADVANCED = 6, "Advanced,上級"
+    GRADE_1 = 7, "Grade 1,1級"
+    GRADE_PRE1 = 8, "Grade Pre-1,準1級"
+    GRADE_2 = 9, "Grade 2,2級"
+    GRADE_PRE2 = 10, "Grade Pre-2,準2級"
+    GRADE_3 = 11, "Grade 3,3級"
+    GRADE_4 = 12, "Grade 4,4級"
+    GRADE_5 = 13, "Grade 5,5級"
+
+
+class CourseCategoryChoices(models.IntegerChoices):
+    """Integer choices for categories of courses"""
+
+    GENERAL = 0, "General,日常"
+    BUSINESS = 1, "Business,ビジネス"
+    TEST_PREPARATION = 2, "Test Preparation,テスト対策"
+    WRITING = 3, "Writing, ライティング"

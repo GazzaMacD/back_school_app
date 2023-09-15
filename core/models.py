@@ -86,6 +86,13 @@ class LevelChoices(models.IntegerChoices):
     INTERMEDIATE = 4, "Intermediate,中級 "
     UPPER_INTERMEDIATE = 5, "Upper Intermediate,中上級"
     ADVANCED = 6, "Advanced,上級"
+    GRADE_1 = 7, "Grade 1,1級"
+    GRADE_PRE1 = 8, "Grade Pre-1,準1級"
+    GRADE_2 = 9, "Grade 2,2級"
+    GRADE_PRE2 = 10, "Grade Pre-2,準2級"
+    GRADE_3 = 11, "Grade 3,3級"
+    GRADE_4 = 12, "Grade 4,4級"
+    GRADE_5 = 13, "Grade 5,5級"
 
 
 class CourseCategoryChoices(models.IntegerChoices):

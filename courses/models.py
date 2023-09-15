@@ -21,29 +21,41 @@ COURSE_CHOICES_DICT = dict(CourseCategoryChoices.choices)
 LEVEL_CHOICES_DICT = dict(LevelChoices.choices)
 
 
+class HeaderImageFieldSerializer(Field):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "title": value.title,
+            "original": value.get_rendition("original").attrs_dict,
+            "medium": value.get_rendition("fill-1280x800").attrs_dict,
+            "thumbnail": value.get_rendition("fill-560x350").attrs_dict,
+            "alt": value.title,
+        }
+
+
 class CourseFieldSerializer(Field):
     def to_representation(self, value):
         return {
             "id": value.id,
             "title_en": value.title_en,
             "subject": value.subject,
-            "subject_display": value.get_subject_display(),
+            "display": value.get_subject_display(),
         }
 
 
 class CourseCategoryFieldSerializer(Field):
     def to_representation(self, value):
         return {
-            "course_category_number": value,
-            "course_category_display": COURSE_CHOICES_DICT[value],
+            "number": value,
+            "display": COURSE_CHOICES_DICT[value],
         }
 
 
 class LevelFieldsSerializer(Field):
     def to_representation(self, value):
         return {
-            "level_number": value,
-            "level_display": LEVEL_CHOICES_DICT[value],
+            "number": value,
+            "display": LEVEL_CHOICES_DICT[value],
         }
 
 
@@ -54,10 +66,10 @@ class CourseRelatedFieldSerializer(Field):
             "id": value.id,
             "title": value.title,
             "display_title": value.display_title,
-            "short_intro": value.short_intro,
+            "display_intro": value.display_intro,
             "slug": value.slug,
-            "subject": value.subject,
-            "subject_display": value.subject_display,
+            "subject_slug": value.subject_slug,
+            "subject_display": value.course.get_subject_display(),
             "image": {
                 "id": image.id,
                 "title": image.title,
@@ -254,7 +266,7 @@ class CourseDisplayDetailPage(Page):
     api_fields = [
         APIField("display_title"),
         APIField("course", serializer=CourseFieldSerializer()),
-        APIField("header_image"),
+        APIField("header_image", serializer=HeaderImageFieldSerializer()),
         APIField("subject_slug"),
         APIField("display_intro"),
         APIField("course_category", serializer=CourseCategoryFieldSerializer()),

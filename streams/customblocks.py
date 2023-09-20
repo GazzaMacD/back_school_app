@@ -4,7 +4,7 @@ from wagtail.images.blocks import ImageChooserBlock
 
 
 class CustomImageChooserBlock(ImageChooserBlock):
-    """Customize api json response to include url string to image and thumbnail. Images are of 16/10 aspect ratio except one of 16/9"""
+    """Customize api json response to include url string to image and thumbnail. Images are of 16/10 aspect ratio."""
 
     def get_api_representation(self, value, context=None):
         if value:
@@ -13,7 +13,6 @@ class CustomImageChooserBlock(ImageChooserBlock):
                 "title": value.title,
                 "original": value.get_rendition("original").attrs_dict,
                 "medium": value.get_rendition("fill-1024x640").attrs_dict,
-                "16/9": value.get_rendition("fill-1024x576").attrs_dict,
                 "thumbnail": value.get_rendition("fill-560x350").attrs_dict,
             }
 
@@ -249,12 +248,13 @@ class ConversationBlock(blocks.StructBlock):
 # NOTE: image sizes still to be decided
 
 
-class FullWidthImage(blocks.StructBlock):
-    """A full width image at large screen size with  optional caption and attribution"""
+class StandardCustomImageBlock(blocks.StructBlock):
+    """Custom image block for 16/10 (2048x1280px) with caption and attribution options.
+    Uses customized api representation sizes of 'original', 'medium' and 'thumbnail'"""
 
     image = CustomImageChooserBlock(
         required=True,
-        help_text="Full width at large screen size. Image size: 2048px x 1280px (16/10 ratio)",
+        help_text="Required. Image size: 2048px x 1280px (16/10 ratio)",
     )
     caption = blocks.CharBlock(
         max_length=200,
@@ -284,81 +284,3 @@ class FullWidthImage(blocks.StructBlock):
 
     class Meta:
         icon = "image"
-        label = "Full Width Image"
-
-
-class BeyondContentWidthImage(blocks.StructBlock):
-    """An image that will project beyond the text content column on both sides
-    at medium and large screen size with an optional caption and attribution"""
-
-    image = CustomImageChooserBlock(
-        required=True,
-        help_text="Image will extend beyond text content width at large screen size. Image size: 2048px x 1280px (16/10 ratio)",
-    )
-    caption = blocks.CharBlock(
-        max_length=200,
-        required=False,
-        help_text="Optional. Caption, max length = 200",
-    )
-    author = blocks.CharBlock(
-        max_length=50,
-        required=False,
-        help_text="Optional. The image creators name if attribution is required or nice to do, max length = 50",
-    )
-    attribution_url = blocks.URLBlock(
-        max_length=100,
-        required=False,
-        help_text="Optional. The url to the author or image place, max length = 100",
-    )
-    license_type = blocks.CharBlock(
-        max_length=50,
-        required=False,
-        help_text="Optional. The type of license, eg: Creative Commons. max length = 50",
-    )
-    license_url = blocks.URLBlock(
-        max_length=100,
-        required=False,
-        help_text="Optional. The link to relevant license. max length = 100",
-    )
-
-    class Meta:
-        icon = "image"
-        label = "Beyond Content Image"
-
-
-class ContentWidthImage(blocks.StructBlock):
-    """An image that will line up with the text content with optional caption and attribution"""
-
-    image = CustomImageChooserBlock(
-        required=True,
-        help_text="Image will extend beyond text content width at large screen size. Image size: 2048px x 1280px (16/10 ratio)  ",
-    )
-    caption = blocks.CharBlock(
-        max_length=200,
-        required=False,
-        help_text="Optional. Caption, max length = 200",
-    )
-    author = blocks.CharBlock(
-        max_length=50,
-        required=False,
-        help_text="Optional. The image creators name if attribution is required or nice to do, max length = 50",
-    )
-    attribution_url = blocks.URLBlock(
-        max_length=100,
-        required=False,
-        help_text="Optional.  The url to the author or image place, max length = 100",
-    )
-    license_type = blocks.CharBlock(
-        max_length=50,
-        required=False,
-        help_text="Optional. The type of license, eg: Creative Commons. max length = 50",
-    )
-    license_url = blocks.URLBlock(
-        max_length=100,
-        required=False,
-        help_text="Optional. The link to relevant license. max length = 100",
-    )
-
-    class Meta:
-        icon = "image"
-        label = " Content Width Image"

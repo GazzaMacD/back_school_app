@@ -169,9 +169,9 @@ class LessonDetailPage(HeadlessMixin, Page):
         [
             ("rich_text", customblocks.CustomRichTextBlock()),
             ("block_quote", customblocks.BlockQuoteBlock()),
-            ("full_width_img", customblocks.FullWidthImage()),
-            ("beyond_text_img", customblocks.BeyondContentWidthImage()),
-            ("text_width_img", customblocks.ContentWidthImage()),
+            ("full_width_img", customblocks.StandardCustomImageBlock()),
+            ("beyond_text_img", customblocks.StandardCustomImageBlock()),
+            ("text_width_img", customblocks.StandardCustomImageBlock()),
             ("youtube", customblocks.YoutubeBlock()),
             ("conversation", customblocks.ConversationBlock()),
             ("mc_questions", customblocks.MCQuestionsBlock()),

@@ -27,7 +27,7 @@ class HeaderImageFieldSerializer(Field):
             "id": value.id,
             "title": value.title,
             "original": value.get_rendition("original").attrs_dict,
-            "medium": value.get_rendition("fill-1280x800").attrs_dict,
+            "medium": value.get_rendition("fill-1024x640").attrs_dict,
             "thumbnail": value.get_rendition("fill-560x350").attrs_dict,
             "alt": value.title,
         }
@@ -74,6 +74,7 @@ class CourseRelatedFieldSerializer(Field):
                 "id": image.id,
                 "title": image.title,
                 "original": image.get_rendition("original").attrs_dict,
+                "medium": image.get_rendition("fill-1024x640").attrs_dict,
                 "thumbnail": image.get_rendition("fill-560x350").attrs_dict,
             },
         }
@@ -219,7 +220,7 @@ class CourseDisplayDetailPage(Page):
     course_description = StreamField(
         [
             ("rich_text", customblocks.CustomRichTextBlock()),
-            ("text_width_img", customblocks.ContentWidthImage()),
+            ("text_width_img", customblocks.StandardCustomImageBlock()),
             ("youtube", customblocks.YoutubeBlock()),
         ],
         use_json_field=True,

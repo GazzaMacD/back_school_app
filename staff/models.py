@@ -111,6 +111,13 @@ class StaffDetailPage(HeadlessMixin, Page):
         related_name="+",
         help_text="Image size: 1080px x 1080px. Please optimize image size before uploading.",
     )
+    intro = models.TextField(
+        "Intro",
+        blank=False,
+        null=False,
+        max_length=200,
+        help_text="Required.",
+    )
     role = models.CharField(
         "Roles in company",
         blank=False,
@@ -155,6 +162,7 @@ class StaffDetailPage(HeadlessMixin, Page):
             [
                 FieldPanel("member"),
                 FieldPanel("profile_image"),
+                FieldPanel("intro"),
                 FieldPanel("role"),
                 FieldPanel("country"),
                 FieldPanel("native_language"),
@@ -175,6 +183,7 @@ class StaffDetailPage(HeadlessMixin, Page):
     api_fields = [
         APIField("member", serializer=MemberFieldSerializer()),
         APIField("profile_image", serializer=StaffProfileImageSerializer()),
+        APIField("intro"),
         APIField("role"),
         APIField("country"),
         APIField("native_language", serializer=LanguageSerializer()),

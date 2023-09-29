@@ -73,7 +73,6 @@ INSTALLED_APPS = [
     "core",
     "courses",
     "home",
-    "learningcenters",
     "languageschools",
     "lessons",
     "streams",

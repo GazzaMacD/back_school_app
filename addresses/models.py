@@ -275,6 +275,12 @@ class Address(TimeStampedModel):
         max_length=255,
         help_text="Name but not required",
     )
+    is_learning_center = models.BooleanField(
+        _("Is Learning Center"),
+        null=False,
+        blank=False,
+        default=False,
+    )
     line_one = models.CharField(
         _("line one"),
         null=False,

@@ -284,3 +284,19 @@ class StandardCustomImageBlock(blocks.StructBlock):
 
     class Meta:
         icon = "image"
+
+
+class SimpleImageBlock(blocks.StructBlock):
+    image = CustomImageChooserBlock(
+        required=True,
+        help_text="Required. Image size: 2048px x 1280px (16/10 ratio)",
+    )
+    caption = blocks.CharBlock(
+        max_length=200,
+        required=False,
+        help_text="Optional. Caption, max length = 200",
+    )
+
+    class Meta:
+        icon = "image"
+        label = "Simple Image Block"

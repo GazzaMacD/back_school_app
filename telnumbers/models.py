@@ -48,6 +48,12 @@ class TelNumber(TimeStampedModel):
         default=False,
         help_text=_("Required. Should be only one per place or contact"),
     )
+    is_learning_center = models.BooleanField(
+        _("Is Learning Center"),
+        null=False,
+        blank=False,
+        default=False,
+    )
 
     def __str__(self) -> str:
         if self.identifier:

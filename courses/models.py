@@ -15,22 +15,11 @@ from core.models import (
     LevelChoices,
     CourseCategoryChoices,
 )
+from core.serializers import HeaderImageFieldSerializer
 from streams import customblocks
 
 COURSE_CHOICES_DICT = dict(CourseCategoryChoices.choices)
 LEVEL_CHOICES_DICT = dict(LevelChoices.choices)
-
-
-class HeaderImageFieldSerializer(Field):
-    def to_representation(self, value):
-        return {
-            "id": value.id,
-            "title": value.title,
-            "original": value.get_rendition("original").attrs_dict,
-            "medium": value.get_rendition("fill-1024x640").attrs_dict,
-            "thumbnail": value.get_rendition("fill-560x350").attrs_dict,
-            "alt": value.title,
-        }
 
 
 class CourseFieldSerializer(Field):
@@ -303,12 +292,6 @@ class CourseDisplayDetailPage(Page):
 
         if not self.slug == slugify(self.course.title_en):
             self.slug = slugify(self.course.title_en)
-
-
-# Override Detail Page title helptextoo
-CourseDisplayDetailPage._meta.get_field(
-    "title"
-).help_text = "The title should match the linked 'course' field title. If it doesn't it will be replaced."
 
 
 class RelatedCourse(Orderable):

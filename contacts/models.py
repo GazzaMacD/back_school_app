@@ -128,6 +128,7 @@ class Contact(TimeStampedModel):
     name = models.CharField(
         _("name"),
         blank=True,
+        default="Anon",
         null=False,
         max_length=100,
         help_text="Full name in the name order and language user would like. English or 日本語 for example. Max length: 100char",
@@ -136,6 +137,7 @@ class Contact(TimeStampedModel):
         _("english name"),
         blank=True,
         null=False,
+        default="Anon",
         max_length=100,
         help_text="Full name in English, order should be same as name. Example 田中たろ should become Tanaka Taro in the field. Max length: 100char",
     )

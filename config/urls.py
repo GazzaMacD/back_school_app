@@ -12,8 +12,8 @@ from search import views as search_views
 from .api import api_router
 
 urlpatterns = [
-    path("django-admin/", admin.site.urls),
-    path("admin/", include(wagtailadmin_urls)),
+    path("xlingual-admin/", admin.site.urls),
+    path("xlingual-cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
 ]

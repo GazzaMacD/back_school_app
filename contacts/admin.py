@@ -92,7 +92,6 @@ class ContactAdmin(admin.ModelAdmin):
             },
         ),
     ]
-    exclude = ("child_of",)
 
     inlines = [
         ContactEmailInline,

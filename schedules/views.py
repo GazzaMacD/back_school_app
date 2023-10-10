@@ -11,7 +11,7 @@ from .serializers import ScheduleSerializer
 
 
 class ScheduleListView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         schedules = SuperSaasSchedule.objects.all()

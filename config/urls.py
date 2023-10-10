@@ -34,6 +34,7 @@ if settings.DEBUG:
 v2 = "api/v2"
 urlpatterns = urlpatterns + [
     # API routes
+    path(f"{v2}/supersaas-schedules/", include("schedules.urls")),
     path(f"{v2}/contact/", include("contacts.urls")),
     path(f"{v2}/lesson-categories/", include("lessons.urls")),
     path(f"{v2}/auth/", include("dj_rest_auth.urls")),

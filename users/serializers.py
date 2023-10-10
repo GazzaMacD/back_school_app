@@ -25,9 +25,9 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         )
 
 
-class CustomUserBasicContactSerializer(serializers.ModelSerializer):
-    contact = ContactUserSerializer()
+class CustomUserContactNameSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="contact.name")
 
     class Meta:
         model = CustomUser
-        fields = ("contact",)
+        fields = ("name",)

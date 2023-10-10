@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import SuperSassSchedule
+from .models import SuperSaasSchedule
 
 
-class SuperSassScheduleAdmin(admin.ModelAdmin):
+class SuperSaasScheduleAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             "Individual Schedule status, creation times and slug",
@@ -28,4 +28,4 @@ class SuperSassScheduleAdmin(admin.ModelAdmin):
     readonly_fields = ("created", "modified", "slug")
 
 
-admin.site.register(SuperSassSchedule, SuperSassScheduleAdmin)
+admin.site.register(SuperSaasSchedule, SuperSaasScheduleAdmin)

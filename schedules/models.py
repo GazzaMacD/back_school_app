@@ -5,7 +5,7 @@ from django.utils.text import slugify
 from core.models import TimeStampedModel
 
 
-class SuperSassSchedule(TimeStampedModel):
+class SuperSaasSchedule(TimeStampedModel):
     teacher = models.ForeignKey(
         "users.CustomUser",
         on_delete=models.CASCADE,

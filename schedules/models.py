@@ -47,15 +47,15 @@ class SuperSaasSchedule(TimeStampedModel):
         slug = slugify(f"{self.teacher.contact.name_en} {self.language_school.name}")
         unique_slug = slug
 
-        if not SuperSassSchedule.objects.filter(slug=unique_slug).exists():
+        if not SuperSaasSchedule.objects.filter(slug=unique_slug).exists():
             return unique_slug
         else:
-            if SuperSassSchedule.objects.filter(slug=unique_slug)[0].id == self.id:
+            if SuperSaasSchedule.objects.filter(slug=unique_slug)[0].id == self.id:
                 return unique_slug
             # create unique slug
             else:
                 counter = 1
-                while SuperSassSchedule.objects.filter(slug=unique_slug).exists():
+                while SuperSaasSchedule.objects.filter(slug=unique_slug).exists():
                     unique_slug = f"{slug}-{counter}"
                     counter += 1
                 return unique_slug

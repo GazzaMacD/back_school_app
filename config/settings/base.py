@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "streams",
     "staff",
     "telnumbers",
+    "testimonials",
     "users",
     # Rest and auth
     "rest_framework",

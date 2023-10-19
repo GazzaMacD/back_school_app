@@ -222,8 +222,8 @@ class ConversationBlock(blocks.StructBlock):
     """A block to compose conversations between two people for educational purposes"""
 
     title = blocks.CharBlock(
-        max_length=30,
-        help_text="A short title for the conversation. Max 30 chars",
+        max_length=50,
+        help_text="A short title for the conversation. Max 50 chars",
     )
     intro = blocks.TextBlock(
         help_text="Set the scene of the conversation",

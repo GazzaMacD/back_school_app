@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import Product
+from .models import ProductService
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductServiceAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "id",
@@ -22,10 +22,12 @@ class ProductAdmin(admin.ModelAdmin):
                     "slug",
                     "created",
                     "modified",
+                    "service_or_product",
+                    "ptype",
                 ],
             },
         ),
     ]
 
 
-admin.site.register(Product, ProductAdmin)
+admin.site.register(ProductService, ProductServiceAdmin)

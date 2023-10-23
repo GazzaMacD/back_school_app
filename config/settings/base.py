@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "home",
     "languageschools",
     "lessons",
+    "products",
     "schedules",
     "streams",
     "staff",

@@ -8,6 +8,11 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from rest_framework.fields import Field
+from wagtail.models import Page
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from wagtail.fields import RichTextField, StreamField
+from wagtail.api import APIField
 
 from core.models import TimeStampedModel
 
@@ -159,6 +164,116 @@ class ProductServicePrice(TimeStampedModel):
         return f"{self.name} (￥{self.price})"
 
 
+class LearningExperience(TimeStampedModel):
+    """Model for learning experiences"""
+
+    name = models.CharField(
+        _("Name"),
+        blank=False,
+        null=False,
+        max_length=200,
+        help_text=_("Required. Max length 200 characters."),
+    )
+    product_service = models.ForeignKey(
+        ProductService,
+        blank=False,
+        null=False,
+        on_delete=models.PROTECT,
+        related_name="learningexperiences",
+        help_text=_("Required."),
+    )
+
+    def __str__(self):
+        return self.name
+
+
 # =====================
-# Display Page Models
+# Display Page Models and field serializers
 # =====================
+class LearningExperienceListPage(Page):
+    display_title = models.CharField(
+        "Display Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 characters, 45 or less is ideal",
+    )
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("display_title"),
+            ],
+            heading="Learning Experience header section",
+        ),
+    ]
+
+    api_fields = [
+        APIField("display_title"),
+    ]
+
+    # Page limitations, Meta and methods
+    max_count = 1
+    parent_page_types = [
+        "home.HomePage",
+    ]
+
+    def __str__(self):
+        return self.title
+
+
+# Field Serializers
+class LESerializer(Field):
+    def to_representation(self, value):
+        prices = []
+        for p in value.product_service.prices.all():
+            price_dict = {
+                "name": p.name,
+                "pre_tax_price": str(p.price),
+            }
+            prices.append(price_dict)
+
+        return {
+            "id": value.id,
+            "name": value.name,
+            "product_service": {"name": value.product_service.name, "prices": prices},
+        }
+
+
+class LearningExperienceDetailPage(Page):
+    display_title = models.CharField(
+        "Display Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 characters, 45 or less is ideal",
+    )
+    learning_experience = models.OneToOneField(
+        LearningExperience,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        help_text="The associated learning experience",
+    )
+
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("display_title"),
+                FieldPanel("learning_experience"),
+            ],
+            heading="Learning Experience header section",
+        ),
+    ]
+
+    api_fields = [
+        APIField("display_title"),
+        APIField("learning_experience", serializer=LESerializer()),
+    ]
+
+    # Page limitations, Meta and methods
+    parent_page_types = [
+        "products.LearningExperienceListPage",
+    ]
+
+    def __str__(self):
+        return self.title

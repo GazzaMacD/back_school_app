@@ -41,6 +41,27 @@ class CustomRichTextBlock(blocks.RichTextBlock):
             label = "Rich Text"
 
 
+class CustomLimitedRichTextBlock(blocks.RichTextBlock):
+    """Rich text block with very limited features"""
+
+    def __init__(
+        self,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.features = [
+            "h3",
+            "h4",
+            "bold",
+            "italic",
+            "ul",
+        ]
+
+        class Meta:
+            icon = "pilcrow"
+            label = "Limited Rich Text"
+
+
 class YoutubeBlock(blocks.StructBlock):
     """Block to add responsive imbeded youtube video"""
 
@@ -300,3 +321,39 @@ class SimpleImageBlock(blocks.StructBlock):
     class Meta:
         icon = "image"
         label = "Simple Image Block"
+
+
+# =============== Schedule Blocks ======================
+
+
+class DateTimeDetailItemBlock(blocks.StructBlock):
+    date = blocks.DateBlock(
+        required=False,
+        help_text="Not Required. Only needed for experience that have multiple sessions",
+    )
+    time = blocks.TimeBlock(
+        required=True,
+        help_text="Required",
+    )
+    detail = blocks.TextBlock(
+        max_length=500,
+        help_text="Required. Max length 500",
+    )
+
+
+class ScheduleBlock(blocks.StructBlock):
+    """A block to compose a schedule"""
+
+    title = blocks.CharBlock(
+        max_length=50,
+        help_text="A short title for the schedule. Max 50 chars",
+    )
+    intro = blocks.TextBlock(
+        required=False,
+        help_text="Not required. Intro to schedule below",
+    )
+    schedule = blocks.ListBlock(DateTimeDetailItemBlock())
+
+    class Meta:
+        icon = "time"
+        label = "Schedule Block"

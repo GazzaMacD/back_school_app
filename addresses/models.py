@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from wagtail.snippets.models import register_snippet
+
 
 from contacts.models import Contact
 from core.models import TimeStampedModel
@@ -330,6 +332,75 @@ class Address(TimeStampedModel):
         if self.name:
             return self.name
         return self.line_one
+
+
+@register_snippet
+class ExperienceAddress(models.Model):
+    name = models.CharField(
+        _("Name"),
+        null=False,
+        blank=False,
+        max_length=255,
+        help_text="Place name in English",
+    )
+    display_name = models.CharField(
+        _("Display name"),
+        null=False,
+        blank=False,
+        max_length=255,
+        help_text="Place name in to be displayed on site",
+    )
+    line_one = models.CharField(
+        _("Line one"),
+        null=False,
+        blank=False,
+        max_length=255,
+        help_text="Line one to be displayed on site",
+    )
+    line_two = models.CharField(
+        _("Line two"),
+        null=False,
+        blank=True,
+        max_length=255,
+        help_text="Line two to be displayed on site",
+    )
+    city_town_village = models.CharField(
+        _("City town or village"),
+        null=False,
+        blank=False,
+        max_length=255,
+        help_text="city, town or village to be displayed on site",
+    )
+    prefecture_state = models.CharField(
+        _("Prefecture or state"),
+        null=False,
+        blank=False,
+        max_length=100,
+        help_text="Prefecture to be displayed on site",
+    )
+    postal_code = models.CharField(
+        _("Post code or zip code"),
+        null=False,
+        blank=True,
+        max_length=100,
+        help_text="Not required but preferable if available. Displayed on site",
+    )
+    country = models.CharField(
+        _("Country"),
+        null=False,
+        blank=False,
+        max_length=3,
+        choices=CountryChoices.choices,
+        default=CountryChoices.JAPAN,
+        help_text="Required",
+    )
+
+    class Meta:
+        verbose_name = "Experience Address"
+        verbose_name_plural = "Experience Addresses"
+
+    def __str__(self) -> str:
+        return self.name
 
 
 # ============= /* Intermediary Models */==================

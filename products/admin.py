@@ -1,11 +1,23 @@
 from django.contrib import admin
 
-from .models import ProductService, ProductServicePrice
+from .models import ProductService, ProductServicePrice, LearningExperience
 
 
 class ProductServicePriceInline(admin.TabularInline):
     model = ProductServicePrice
     extra = 0
+
+
+class LearningExperienceAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "start_date",
+        "end_date",
+        "max_people",
+        "total_attended",
+        "total_new",
+        "total_profit",
+    )
 
 
 class ProductServiceAdmin(admin.ModelAdmin):
@@ -45,3 +57,4 @@ class ProductServiceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ProductService, ProductServiceAdmin)
+admin.site.register(LearningExperience, LearningExperienceAdmin)

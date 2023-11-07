@@ -8,8 +8,17 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from modelcluster.fields import ParentalKey
+from rest_framework.fields import Field
+from wagtail.models import Page, Orderable
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
+from wagtail.fields import RichTextField, StreamField
+from wagtail.api import APIField
 
+from streams import customblocks
 from core.models import TimeStampedModel
+from core.serializers import HeaderImageFieldSerializer
+from lessons.models import LessonRelatedFieldSerializer
 
 # =====================
 # Model Choices
@@ -159,6 +168,343 @@ class ProductServicePrice(TimeStampedModel):
         return f"{self.name} (￥{self.price})"
 
 
+class LearningExperience(TimeStampedModel):
+    """Base Model for a learning experience"""
+
+    name = models.CharField(
+        _("Name"),
+        blank=False,
+        null=False,
+        max_length=200,
+        help_text=_("Required. Max length 200 characters."),
+    )
+    product_service = models.ForeignKey(
+        ProductService,
+        blank=False,
+        null=False,
+        on_delete=models.PROTECT,
+        related_name="learningexperiences",
+        limit_choices_to={"ptype": "experience"},
+        help_text=_("Required."),
+    )
+    start_date = models.DateField(
+        _("Start Date"),
+        blank=False,
+        null=False,
+        help_text=_("Required."),
+    )
+    end_date = models.DateField(
+        _("End Date"),
+        blank=False,
+        null=False,
+        help_text=_("Required."),
+    )
+    max_people = models.PositiveSmallIntegerField(
+        _("Max People"),
+        blank=False,
+        null=False,
+        default=0,
+        help_text=_("Required."),
+    )
+    total_attended = models.PositiveSmallIntegerField(
+        _("Total People"),
+        blank=False,
+        null=False,
+        default=0,
+        help_text=_("Required."),
+    )
+    total_new = models.PositiveSmallIntegerField(
+        _("New people"),
+        blank=False,
+        null=False,
+        default=0,
+        help_text=_("Required."),
+    )
+    total_profit = models.DecimalField(
+        _("Total Profit (￥)"),
+        blank=False,
+        null=False,
+        max_digits=10,
+        decimal_places=0,
+        default=Decimal("0"),
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text=_("Required. Basic, revenue - total costs including teacher time."),
+    )
+
+    def __str__(self):
+        return f"{self.start_date} | {self.name}"
+
+
 # =====================
-# Display Page Models
+# Display Page Models and field serializers
 # =====================
+class LearningExperienceListPage(Page):
+    display_title = models.CharField(
+        "Display Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 characters, 45 or less is ideal",
+    )
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("display_title"),
+            ],
+            heading="Learning Experience header section",
+        ),
+    ]
+
+    api_fields = [
+        APIField("display_title"),
+    ]
+
+    # Page limitations, Meta and methods
+    max_count = 1
+    parent_page_types = [
+        "home.HomePage",
+    ]
+
+    def __str__(self):
+        return self.title
+
+
+# ================================
+# Detail Page and Field Serializers
+# ================================
+
+
+class LESerializer(Field):
+    def to_representation(self, value):
+        prices = []
+        for p in value.product_service.prices.all():
+            price_dict = {
+                "id": p.id,
+                "name": p.name,
+                "pre_tax_price": str(p.price),
+            }
+            prices.append(price_dict)
+
+        return {
+            "id": value.id,
+            "name": value.name,
+            "product_service": {
+                "id": value.product_service.id,
+                "name": value.product_service.name,
+                "prices": prices,
+            },
+        }
+
+
+class StaffMembersFieldSerializer(Field):
+    def to_representation(self, value):
+        image = value.profile_image
+        return {
+            "id": value.id,
+            "name": value.title,
+            "slug": value.slug,
+            "position": value.role,
+            "intro": value.intro,
+            "image": {
+                "id": image.id,
+                "title": image.title,
+                "original": image.get_rendition("original").attrs_dict,
+                "thumbnail": image.get_rendition("fill-450x450").attrs_dict,
+            },
+        }
+
+
+class ExperienceAddressFieldSerializer(Field):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "name": value.name,
+            "displayName": value.display_name,
+            "lineOne": value.line_one,
+            "lineTwo": value.line_two,
+            "cityTownVillage": value.city_town_village,
+            "postalCode": value.postal_code,
+            "country": value.get_country_display(),
+        }
+
+
+class LearningExperienceDetailPage(Page):
+    display_title = models.CharField(
+        "Display Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 characters, 45 or less is ideal",
+    )
+    learning_experience = models.OneToOneField(
+        LearningExperience,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        help_text="The associated learning experience",
+    )
+    header_image = models.ForeignKey(
+        "wagtailimages.Image",
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+        related_name="+",
+        help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
+    )
+    will_do = RichTextField(
+        "What you will do",
+        blank=False,
+        null=False,
+        features=[
+            "h3",
+            "h4",
+            "bold",
+            "italic",
+            "ol",
+            "ul",
+        ],
+        help_text="Required. Include how this helps language learning",
+    )
+    past_photos = StreamField(
+        [
+            (
+                "simple_image_block",
+                customblocks.SimpleImageBlock(),
+            ),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+        min_num=4,
+    )
+    details = StreamField(
+        [
+            (
+                "limited_rich_text_block",
+                customblocks.CustomLimitedRichTextBlock(),
+            ),
+            (
+                "schedule_block",
+                customblocks.ScheduleBlock(),
+            ),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
+    display_map = models.TextField(
+        "Display map",
+        null=False,
+        blank=False,
+        help_text='Required. Please paste the iframe imbed code here. Please remove both the height="....." and width="....." attributes from the code before saving otherwise the map will not display as intended on the site',
+    )
+    address = models.ForeignKey(
+        "addresses.ExperienceAddress",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Not required but preferable if applicable",
+    )
+
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("display_title"),
+                FieldPanel("learning_experience"),
+                FieldPanel("header_image"),
+            ],
+            heading="Header section",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("will_do"),
+                InlinePanel("staff_members", label="Staff Member"),
+                FieldPanel("past_photos"),
+            ],
+            heading="Will do, staff and past photos",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("details"),
+            ],
+            heading="Details and schedules",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("display_map"),
+                FieldPanel("address"),
+            ],
+            heading="Maps and address",
+        ),
+        MultiFieldPanel(
+            [
+                InlinePanel("related_lessons", label="Lesson", max_num=4),
+            ],
+            heading="Related Lessons",
+        ),
+    ]
+
+    api_fields = [
+        APIField("display_title"),
+        APIField("learning_experience", serializer=LESerializer()),
+        APIField("header_image", serializer=HeaderImageFieldSerializer()),
+        APIField("will_do"),
+        APIField("staff_members"),
+        APIField("past_photos"),
+        APIField("details"),
+        APIField("display_map"),
+        APIField("address", serializer=ExperienceAddressFieldSerializer()),
+        APIField("related_lessons"),
+    ]
+
+    # Page limitations, Meta and methods
+    parent_page_types = [
+        "products.LearningExperienceListPage",
+    ]
+
+    def __str__(self):
+        return self.title
+
+
+class ExperiencePageStaff(Orderable):
+    page = ParentalKey(
+        LearningExperienceDetailPage,
+        on_delete=models.CASCADE,
+        related_name="staff_members",
+    )
+    staff = models.ForeignKey(
+        "staff.StaffDetailPage",
+        on_delete=models.CASCADE,
+    )
+    # Panels
+
+    panels = [
+        FieldPanel("staff"),
+    ]
+
+    api_fields = [
+        APIField("staff", serializer=StaffMembersFieldSerializer()),
+    ]
+
+    def __str__(self):
+        return self.staff.title
+
+
+class ExperienceRelatedLessons(Orderable):
+    """Orderable field for lessons that should be connected to this learing experience"""
+
+    page = ParentalKey(
+        LearningExperienceDetailPage,
+        on_delete=models.CASCADE,
+        related_name="related_lessons",
+    )
+    lesson = models.ForeignKey("lessons.LessonDetailPage", on_delete=models.CASCADE)
+
+    panels = [
+        FieldPanel("lesson"),
+    ]
+
+    api_fields = [
+        APIField("lesson", serializer=LessonRelatedFieldSerializer()),
+    ]

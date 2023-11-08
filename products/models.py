@@ -14,6 +14,7 @@ from wagtail.models import Page, Orderable
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.fields import RichTextField, StreamField
 from wagtail.api import APIField
+from wagtail_headless_preview.models import HeadlessMixin
 
 from streams import customblocks
 from core.models import TimeStampedModel
@@ -238,7 +239,7 @@ class LearningExperience(TimeStampedModel):
 # =====================
 # Display Page Models and field serializers
 # =====================
-class LearningExperienceListPage(Page):
+class LearningExperienceListPage(HeadlessMixin, Page):
     display_title = models.CharField(
         "Display Title",
         blank=False,
@@ -281,14 +282,16 @@ class LESerializer(Field):
             price_dict = {
                 "id": p.id,
                 "name": p.name,
-                "pre_tax_price": str(p.price),
+                "preTaxPrice": str(p.price),
             }
             prices.append(price_dict)
 
         return {
             "id": value.id,
             "name": value.name,
-            "product_service": {
+            "startDate": value.start_date,
+            "endDate": value.end_date,
+            "productService": {
                 "id": value.product_service.id,
                 "name": value.product_service.name,
                 "prices": prices,
@@ -328,13 +331,20 @@ class ExperienceAddressFieldSerializer(Field):
         }
 
 
-class LearningExperienceDetailPage(Page):
+class LearningExperienceDetailPage(HeadlessMixin, Page):
     display_title = models.CharField(
         "Display Title",
         blank=False,
         null=False,
         max_length=100,
         help_text="Required. Max length 100 characters, 45 or less is ideal",
+    )
+    display_tagline = models.CharField(
+        "Disply Tagline",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the experience",
     )
     learning_experience = models.OneToOneField(
         LearningExperience,
@@ -350,6 +360,18 @@ class LearningExperienceDetailPage(Page):
         null=True,
         related_name="+",
         help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
+    )
+    start_date = models.DateField(
+        "Start Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'learning_experience'",
+    )
+    end_date = models.DateField(
+        "End Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'learning_experience'",
     )
     will_do = RichTextField(
         "What you will do",
@@ -411,8 +433,11 @@ class LearningExperienceDetailPage(Page):
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
                 FieldPanel("learning_experience"),
                 FieldPanel("header_image"),
+                FieldPanel("start_date", read_only=True),
+                FieldPanel("end_date", read_only=True),
             ],
             heading="Header section",
         ),
@@ -447,8 +472,11 @@ class LearningExperienceDetailPage(Page):
 
     api_fields = [
         APIField("display_title"),
+        APIField("display_tagline"),
         APIField("learning_experience", serializer=LESerializer()),
         APIField("header_image", serializer=HeaderImageFieldSerializer()),
+        APIField("start_date"),
+        APIField("end_date"),
         APIField("will_do"),
         APIField("staff_members"),
         APIField("past_photos"),
@@ -465,6 +493,13 @@ class LearningExperienceDetailPage(Page):
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        """Custom clean method to make start_date and end_date duplicate learning experience fields of same name. This denormalization and duplication is to reduce queries the list views"""
+        if not self.start_date == self.learning_experience.start_date:
+            self.start_date = self.learning_experience.start_date
+        if not self.end_date == self.learning_experience.end_date:
+            self.end_date = self.learning_experience.end_date
 
 
 class ExperiencePageStaff(Orderable):

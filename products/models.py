@@ -78,6 +78,14 @@ class ProductService(TimeStampedModel):
         choices=ProductServiceTypeChoices.choices,
         help_text="Required",
     )
+    tax_rate = models.ForeignKey(
+        "taxes.Tax",
+        blank=False,
+        null=False,
+        on_delete=models.PROTECT,
+        related_name="product_services",
+        help_text=_("Required. Must set correctly."),
+    )
     description = models.TextField(
         _("Product Description"),
         null=False,

@@ -26,6 +26,7 @@ class ProductServiceAdmin(admin.ModelAdmin):
         "service_or_product",
         "ptype",
         "price_summary",
+        "tax_rate",
         "id",
     )
     readonly_fields = [
@@ -45,6 +46,7 @@ class ProductServiceAdmin(admin.ModelAdmin):
                     "modified",
                     "service_or_product",
                     "ptype",
+                    "tax_rate",
                     "price_summary",
                     "description",
                 ],

@@ -1,4 +1,3 @@
-import decimal
 from decimal import Decimal
 
 from django.db import models
@@ -289,7 +288,6 @@ class LESerializer(Field):
         return str(round(price + (price * (tax_rate / Decimal("100.00")))))
 
     def to_representation(self, value):
-        ctx = decimal.getcontext()
         prices = []
         tax_rate = value.product_service.tax_rate.rate
         for p in value.product_service.prices.all():

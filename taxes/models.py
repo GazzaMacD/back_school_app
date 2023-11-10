@@ -52,3 +52,6 @@ class Tax(TimeStampedModel):
 
     def __str__(self):
         return f"{self.name} ({self.rate}%)"
+
+    class Meta:
+        verbose_name_plural = "Taxes"

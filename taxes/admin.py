@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Tax
+
+
+class TaxAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Tax, TaxAdmin)

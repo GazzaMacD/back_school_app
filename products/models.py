@@ -284,13 +284,18 @@ class LearningExperienceListPage(HeadlessMixin, Page):
 
 
 class LESerializer(Field):
+    def calculate_taxed_amount(self, price, tax_rate):
+        return str(round(price + (price * (tax_rate / Decimal("100.00")))))
+
     def to_representation(self, value):
         prices = []
+        tax_rate = value.product_service.tax_rate.rate
         for p in value.product_service.prices.all():
             price_dict = {
                 "id": p.id,
                 "name": p.name,
-                "preTaxPrice": str(p.price),
+                "beforeTaxPrice": str(p.price),
+                "afterTaxPrice": self.calculate_taxed_amount(p.price, tax_rate),
             }
             prices.append(price_dict)
 
@@ -302,6 +307,7 @@ class LESerializer(Field):
             "productService": {
                 "id": value.product_service.id,
                 "name": value.product_service.name,
+                "taxRate": tax_rate,
                 "prices": prices,
             },
         }

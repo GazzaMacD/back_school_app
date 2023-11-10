@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "schedules",
     "streams",
     "staff",
+    "taxes",
     "telnumbers",
     "testimonials",
     "users",

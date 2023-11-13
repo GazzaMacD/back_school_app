@@ -317,8 +317,8 @@ class LESerializer(Field):
                 "id": p.id,
                 "name": p.name,
                 "display_name": p.display_name,
-                "beforeTaxPrice": str(p.price),
-                "afterTaxPrice": self.calculate_taxed_amount(p.price, tax_rate),
+                "pretax_price": str(p.price),
+                "posttax_price": self.calculate_taxed_amount(p.price, tax_rate),
                 "start_date": p.start_date,
                 "is_limited_sale": p.is_limited_sale,
                 "before_sale_pretax_price": p.before_sale_price,
@@ -332,12 +332,12 @@ class LESerializer(Field):
         return {
             "id": value.id,
             "name": value.name,
-            "startDate": value.start_date,
-            "endDate": value.end_date,
-            "productService": {
+            "start_date": value.start_date,
+            "end_date": value.end_date,
+            "product_service": {
                 "id": value.product_service.id,
                 "name": value.product_service.name,
-                "taxRate": tax_rate,
+                "tax_rate": tax_rate,
                 "prices": prices,
             },
         }
@@ -366,11 +366,11 @@ class ExperienceAddressFieldSerializer(Field):
         return {
             "id": value.id,
             "name": value.name,
-            "displayName": value.display_name,
-            "lineOne": value.line_one,
-            "lineTwo": value.line_two,
-            "cityTownVillage": value.city_town_village,
-            "postalCode": value.postal_code,
+            "display_name": value.display_name,
+            "line_one": value.line_one,
+            "line_two": value.line_two,
+            "city_town_village": value.city_town_village,
+            "postal_code": value.postal_code,
             "country": value.get_country_display(),
         }
 

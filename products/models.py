@@ -142,7 +142,16 @@ class ProductServicePrice(TimeStampedModel):
         blank=False,
         null=False,
         max_length=200,
-        help_text=_("Required. Max length 200 characters."),
+        help_text=_("Required. Max length 200 characters. In English please."),
+    )
+    display_name = models.CharField(
+        _("Display Name"),
+        blank=False,
+        null=False,
+        max_length=200,
+        help_text=_(
+            "Required. Max length 200 characters. Will in many cases be Japanese name."
+        ),
     )
     price = models.DecimalField(
         _("Price"),
@@ -165,6 +174,17 @@ class ProductServicePrice(TimeStampedModel):
         null=False,
         default=False,
         help_text="If ticked, please make sure to add the end date",
+    )
+    before_sale_price = models.DecimalField(
+        _("Before Sale Pretax Price"),
+        blank=True,
+        null=True,
+        max_digits=10,
+        decimal_places=0,
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text=_(
+            "NOT Required. Only enter this price for 'is_limited_sale' prices. It will show up with line through on any front end display to indicate that price has been cut for the limited time"
+        ),
     )
     end_date = models.DateTimeField(
         _("End date"),
@@ -285,6 +305,8 @@ class LearningExperienceListPage(HeadlessMixin, Page):
 
 class LESerializer(Field):
     def calculate_taxed_amount(self, price, tax_rate):
+        if not isinstance(price, Decimal) or not isinstance(tax_rate, Decimal):
+            return None
         return str(round(price + (price * (tax_rate / Decimal("100.00")))))
 
     def to_representation(self, value):
@@ -294,8 +316,16 @@ class LESerializer(Field):
             price_dict = {
                 "id": p.id,
                 "name": p.name,
+                "display_name": p.display_name,
                 "beforeTaxPrice": str(p.price),
                 "afterTaxPrice": self.calculate_taxed_amount(p.price, tax_rate),
+                "start_date": p.start_date,
+                "is_limited_sale": p.is_limited_sale,
+                "before_sale_pretax_price": p.before_sale_price,
+                "before_sale_posttax_price": self.calculate_taxed_amount(
+                    p.before_sale_price, tax_rate
+                ),
+                "end_date": p.end_date,
             }
             prices.append(price_dict)
 

@@ -52,6 +52,19 @@ class ProductServiceAdmin(admin.ModelAdmin):
                 ],
             },
         ),
+        (
+            "Classes Information",
+            {
+                "fields": [
+                    "class_type",
+                    "class_num",
+                    "class_delivery",
+                ],
+                "classes": [
+                    "collapse",
+                ],
+            },
+        ),
     ]
     inlines = [
         ProductServicePriceInline,

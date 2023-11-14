@@ -275,17 +275,57 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         max_length=100,
         help_text="Required. Max length 100 characters, 45 or less is ideal",
     )
+    display_tagline = models.CharField(
+        "Disply Tagline",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the experiences",
+    )
+    intro = RichTextField(
+        "Introduction",
+        blank=False,
+        null=False,
+        features=[
+            "h3",
+            "h4",
+            "bold",
+            "italic",
+            "ol",
+            "ul",
+        ],
+        help_text="Required. For the concepts surrounding learning experiences",
+    )
+    experiences_gallery = StreamField(
+        [
+            (
+                "simple_image_block",
+                customblocks.SimpleImageBlock(),
+            ),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+        min_num=4,
+        max_num=20,
+    )
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
+                FieldPanel("intro"),
             ],
             heading="Learning Experience header section",
         ),
+        FieldPanel("experiences_gallery"),
     ]
 
     api_fields = [
         APIField("display_title"),
+        APIField("display_tagline"),
+        APIField("intro"),
+        APIField("experiences_gallery"),
     ]
 
     # Page limitations, Meta and methods

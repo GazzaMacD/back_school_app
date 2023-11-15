@@ -40,8 +40,8 @@ class ProductOrServiceChoices(models.TextChoices):
 
 class ClassTypeChoices(models.TextChoices):
     NA = "na", "N/a"
-    PRIVATE = "private", "Private,??"
-    CONTROLLED = "controlled", "Company Controlled"
+    PRIVATE = "private", "Private,プライベート"
+    CONTROLLED = "controlled", "Company Controlled,一般"
 
 
 class ClassNumChoices(models.TextChoices):
@@ -56,6 +56,14 @@ class ClassDeliveryChoices(models.TextChoices):
     INPERSON = "inperson", "In person,??"
     HYBRID = "hybrid", "Hybrid,??"
     ONLINE_ASYNC = "online-async", "Online Async,??"
+
+
+class ClassUnitChoices(models.TextChoices):
+    NA = "na", "N/a"
+    WEEK = "week", "Week,週"
+    MONTH = "month", "Month,月"
+    YEAR = "year", "Year,年"
+    PAYMENT = "payment", "Payment,支払"
 
 
 # =====================
@@ -121,6 +129,20 @@ class ProductService(TimeStampedModel):
         default=ClassDeliveryChoices.NA,
         choices=ClassDeliveryChoices.choices,
         help_text="Class field only. How the class is delivered",
+    )
+    class_quantity = models.PositiveSmallIntegerField(
+        _("Class Quantity/Unit"),
+        null=True,
+        blank=True,
+        help_text="Number classes per unit",
+    )
+    class_unit = models.CharField(
+        _("Class Unit"),
+        null=False,
+        blank=False,
+        default=ClassUnitChoices.NA,
+        choices=ClassUnitChoices.choices,
+        help_text="Required. Unit by which quantity is measured. Example. Month or Payment",
     )
     tax_rate = models.ForeignKey(
         "taxes.Tax",

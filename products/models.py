@@ -732,3 +732,98 @@ class ClassPricesListPage(HeadlessMixin, Page):
 
     def __str__(self):
         return self.title
+
+
+class ClassPricesDetailPage(HeadlessMixin, Page):
+    class_service = models.OneToOneField(
+        ProductService,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        limit_choices_to={"ptype": "class"},
+        help_text="The associated class. Title of this page should match the name of this associated class product. If it doesn't the title will be updated to match on save.",
+    )
+    display_title = models.CharField(
+        "Display Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 characters, 45 or less is ideal",
+    )
+    display_tagline = models.CharField(
+        "Disply Tagline",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the class",
+    )
+    header_image = models.ForeignKey(
+        "wagtailimages.Image",
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+        related_name="+",
+        help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
+    )
+    sales_point1 = models.CharField(
+        "Sales point 1",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20. Attractive sales point",
+    )
+    sales_point2 = models.CharField(
+        "Sales point 1",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20. Attractive sales point",
+    )
+    class_intro = StreamField(
+        [
+            ("rich_text", customblocks.CustomRichTextBlock()),
+            ("beyond_text_img", customblocks.StandardCustomImageBlock()),
+            ("text_width_img", customblocks.StandardCustomImageBlock()),
+            ("youtube", customblocks.YoutubeBlock()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("class_service"),
+                FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
+                FieldPanel("header_image"),
+            ],
+            heading="Class Prices header section",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("sales_point1"),
+                FieldPanel("sales_point2"),
+                FieldPanel("class_intro"),
+            ],
+            heading="Class sales section",
+        ),
+    ]
+
+    api_fields = [
+        APIField("class_service"),
+        APIField("display_title"),
+        APIField("display_tagline"),
+        APIField("header_image", serializer=HeaderImageFieldSerializer()),
+        APIField("sales_point1"),
+        APIField("sales_point2"),
+        APIField("class_intro"),
+    ]
+
+    # Page limitations, Meta and methods
+    parent_page_types = [
+        "products.ClassPricesListPage",
+    ]
+
+    def __str__(self):
+        return self.title

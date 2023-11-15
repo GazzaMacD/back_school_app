@@ -671,3 +671,64 @@ class ExperienceRelatedLessons(Orderable):
     api_fields = [
         APIField("lesson", serializer=LessonRelatedFieldSerializer()),
     ]
+
+
+# ===========================
+# Class Product and Prices
+# ===========================
+
+
+class ClassPricesListPage(HeadlessMixin, Page):
+    display_title = models.CharField(
+        "Display Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 characters, 45 or less is ideal",
+    )
+    display_tagline = models.CharField(
+        "Disply Tagline",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the classes",
+    )
+    intro = RichTextField(
+        "Introduction",
+        blank=False,
+        null=False,
+        features=[
+            "h3",
+            "h4",
+            "bold",
+            "italic",
+            "ol",
+            "ul",
+        ],
+        help_text="Required. For the concepts surrounding Xlingual classes",
+    )
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
+                FieldPanel("intro"),
+            ],
+            heading="Class Prices header section",
+        ),
+    ]
+
+    api_fields = [
+        APIField("display_title"),
+        APIField("display_tagline"),
+        APIField("intro"),
+    ]
+
+    # Page limitations, Meta and methods
+    max_count = 1
+    parent_page_types = [
+        "home.HomePage",
+    ]
+
+    def __str__(self):
+        return self.title

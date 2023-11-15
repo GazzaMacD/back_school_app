@@ -59,6 +59,8 @@ class ProductServiceAdmin(admin.ModelAdmin):
                     "class_type",
                     "class_num",
                     "class_delivery",
+                    "class_quantity",
+                    "class_unit",
                 ],
                 "classes": [
                     "collapse",

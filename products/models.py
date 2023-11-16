@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
@@ -41,7 +42,7 @@ class ProductOrServiceChoices(models.TextChoices):
 class ClassTypeChoices(models.TextChoices):
     NA = "na", "N/a"
     PRIVATE = "private", "Private,プライベート"
-    CONTROLLED = "controlled", "Company Controlled,一般"
+    REGULAR = "regular", "Regular,一般"
 
 
 class ClassNumChoices(models.TextChoices):
@@ -756,6 +757,55 @@ class ClassPricesListPage(HeadlessMixin, Page):
         return self.title
 
 
+class ClassServiceFieldSerializer(Field):
+    def calculate_taxed_amount(self, price, tax_rate):
+        if not isinstance(price, Decimal) or not isinstance(tax_rate, Decimal):
+            return None
+        return str(round(price + (price * (tax_rate / Decimal("100.00")))))
+
+    def get_price(self, prices, tax_rate):
+        filtered_prices = []
+        now = int(timezone.now().timestamp())
+        for price in prices:
+            if now < int(price.start_date.timestamp()):
+                continue
+            if price.end_date and now > int(price.end_date.timestamp()):
+                continue
+            filtered_prices.append(price)
+        filtered_prices.sort(reverse=True, key=lambda x: x.start_date)
+        if len(filtered_prices) > 0:
+            p = filtered_prices[0]
+            return {
+                "name": p.name,
+                "display_name": p.display_name,
+                "pretax_price": str(p.price),
+                "posttax_price": self.calculate_taxed_amount(p.price, tax_rate),
+                "is_sale": p.is_limited_sale,
+                "start_date": p.start_date,
+                "is_limited_sale": p.is_limited_sale,
+                "before_sale_pretax_price": str(p.before_sale_price),
+                "before_sale_posttax_price": self.calculate_taxed_amount(
+                    p.before_sale_price, tax_rate
+                ),
+                "end_date": p.end_date,
+            }
+        return {}
+
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "name": value.name,
+            "slug": value.slug,
+            "class_type": value.class_type,
+            "class_type_display": value.get_class_type_display(),
+            "class_num_display": value.get_class_num_display(),
+            "class_delivery": value.get_class_delivery_display(),
+            "class_quantity": value.class_quantity,
+            "class_unit": value.get_class_unit_display(),
+            "price_info": self.get_price(value.prices.all(), value.tax_rate.rate),
+        }
+
+
 class ClassPricesDetailPage(HeadlessMixin, Page):
     class_service = models.OneToOneField(
         ProductService,
@@ -833,7 +883,7 @@ class ClassPricesDetailPage(HeadlessMixin, Page):
     ]
 
     api_fields = [
-        APIField("class_service"),
+        APIField("class_service", serializer=ClassServiceFieldSerializer()),
         APIField("display_title"),
         APIField("display_tagline"),
         APIField("header_image", serializer=HeaderImageFieldSerializer()),

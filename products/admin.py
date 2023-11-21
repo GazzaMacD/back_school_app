@@ -49,6 +49,14 @@ class ProductServiceAdmin(admin.ModelAdmin):
                     "tax_rate",
                     "price_summary",
                     "description",
+                    ("min_num", "max_num"),
+                    ("length", "length_unit"),
+                    ("quantity", "quantity_unit"),
+                    "is_native",
+                    "is_online",
+                    "is_inperson",
+                    "has_onlinenotes",
+                    "bookable_online",
                 ],
             },
         ),
@@ -57,13 +65,6 @@ class ProductServiceAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     "class_type",
-                    "class_num",
-                    "class_delivery",
-                    "class_quantity",
-                    "class_unit",
-                ],
-                "classes": [
-                    "collapse",
                 ],
             },
         ),

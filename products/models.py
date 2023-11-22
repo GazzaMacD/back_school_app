@@ -1013,3 +1013,10 @@ class ClassPricesDetailPage(HeadlessMixin, Page):
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        """Custom clean method to make sure that title and slug are the same as productservice"""
+        if not self.title == self.class_service.name:
+            self.title = self.class_service.name
+        if not self.slug == self.class_service.slug:
+            self.slug = self.class_service.slug

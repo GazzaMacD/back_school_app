@@ -47,8 +47,8 @@ class LessonRelatedFieldSerializer(Field):
         return {
             "id": value.id,
             "title": value.title,
-            "ja_title": value.ja_title,
-            "short_intro": value.short_intro,
+            "display_title": value.display_title,
+            "display_tagline": value.display_tagline,
             "slug": value.slug,
             "image": {
                 "id": image.id,

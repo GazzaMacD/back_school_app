@@ -10,6 +10,7 @@ from wagtail.api import APIField
 from wagtail.fields import StreamField
 
 from streams import customblocks
+from core.serializers import HeaderImageFieldSerializer
 
 
 # Field Serializers
@@ -63,35 +64,35 @@ class LessonListPage(HeadlessMixin, Page):
     """Page where lessons will be categorized and listed"""
 
     # Model fields
-    ja_title = models.CharField(
-        "Japanese Title",
+    display_title = models.CharField(
+        "Display Title",
         blank=False,
         null=False,
-        max_length=15,
+        max_length=100,
         help_text="Required. Max length 15 characters.",
     )
-    short_intro = models.CharField(
-        "Short Intro",
+    display_tagline = models.CharField(
+        "Display Tagline",
         blank=False,
         null=False,
         max_length=160,
-        help_text="An introduction to the free lessons concept. max length 160 chars",
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the blog lessons",
     )
     # Admin panel configuration
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
-                FieldPanel("ja_title"),
-                FieldPanel("short_intro"),
+                FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
             ],
-            heading="Lesson list page header area",
+            heading="Blog Lessons list page header area",
         )
     ]
 
     # Api configuration
     api_fields = [
-        APIField("ja_title"),
-        APIField("short_intro"),
+        APIField("display_title"),
+        APIField("display_tagline"),
     ]
 
     # Page limitations, Meta and methods
@@ -101,7 +102,8 @@ class LessonListPage(HeadlessMixin, Page):
     ]
 
     class Meta:
-        verbose_name = "Lesson list page"
+        verbose_name = "Blog Lessons List Page"
+        verbose_name_plural = "Blog Lessons List Pages"
 
     def __str__(self):
         return self.title
@@ -131,19 +133,19 @@ class LessonDetailPage(HeadlessMixin, Page):
         related_name="lessons",
         help_text="Author of this lesson",
     )
-    ja_title = models.CharField(
-        "Japanese Title",
+    display_title = models.CharField(
+        "Display Title",
         blank=False,
         null=False,
-        max_length=50,
-        help_text="Required. Max length 50 characters, 45 or less is ideal",
+        max_length=100,
+        help_text="Required. Max length 100 characters, 45 or less is ideal",
     )
-    short_intro = models.CharField(
-        "Short Intro",
+    display_tagline = models.CharField(
+        "Display Tagline",
         blank=False,
         null=False,
-        max_length=90,
-        help_text="A catchy, oneline introduction of what the lesson is about. Max length 90 chars",
+        max_length=160,
+        help_text="A catchy, short introduction of what the blog lesson is about. Max length 160 chars",
     )
     published_date = models.DateTimeField(
         blank=False,
@@ -187,8 +189,8 @@ class LessonDetailPage(HeadlessMixin, Page):
             [
                 FieldPanel("header_image"),
                 FieldPanel("author"),
-                FieldPanel("ja_title"),
-                FieldPanel("short_intro"),
+                FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
                 FieldPanel("published_date"),
                 FieldPanel("estimated_time"),
                 FieldPanel("category"),
@@ -206,10 +208,10 @@ class LessonDetailPage(HeadlessMixin, Page):
 
     # Api configuration
     api_fields = [
-        APIField("header_image"),
+        APIField("header_image", serializer=HeaderImageFieldSerializer()),
         APIField("author", serializer=LessonAuthorFieldSerializer()),
-        APIField("ja_title"),
-        APIField("short_intro"),
+        APIField("display_title"),
+        APIField("display_tagline"),
         APIField("published_date"),
         APIField("estimated_time"),
         APIField("category", serializer=LessonCategoryFieldSerializer()),
@@ -240,6 +242,7 @@ class LessonCategory(models.Model):
     name = models.CharField(
         "Category name",
         blank=False,
+        unique=True,
         null=False,
         max_length=30,
         help_text="English name for category, max 30 chars.",
@@ -247,6 +250,7 @@ class LessonCategory(models.Model):
     ja_name = models.CharField(
         "Japanese Category name",
         blank=False,
+        unique=True,
         null=False,
         max_length=30,
         help_text="English name for category, max 30 chars.",

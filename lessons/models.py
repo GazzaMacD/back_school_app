@@ -144,8 +144,8 @@ class LessonDetailPage(HeadlessMixin, Page):
         "Display Tagline",
         blank=False,
         null=False,
-        max_length=160,
-        help_text="A catchy, short introduction of what the blog lesson is about. Max length 160 chars",
+        max_length=50,
+        help_text="A catchy, short introduction of what the blog lesson is about. Max length 50 chars",
     )
     published_date = models.DateTimeField(
         blank=False,
@@ -176,6 +176,8 @@ class LessonDetailPage(HeadlessMixin, Page):
             ("text_width_img", customblocks.StandardCustomImageBlock()),
             ("youtube", customblocks.YoutubeBlock()),
             ("conversation", customblocks.ConversationBlock()),
+            ("wrong_right_list", customblocks.WrongRightListBlock()),
+            ("examples_list", customblocks.ExamplesListBlock()),
             ("mc_questions", customblocks.MCQuestionsBlock()),
         ],
         use_json_field=True,

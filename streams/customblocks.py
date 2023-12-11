@@ -2,6 +2,8 @@ from wagtail import blocks
 
 from wagtail.images.blocks import ImageChooserBlock
 
+# =============== Image Blocks ======================
+
 
 class CustomImageChooserBlock(ImageChooserBlock):
     """Customize api json response to include url string to image and thumbnail. Images are of 16/10 aspect ratio."""
@@ -15,6 +17,9 @@ class CustomImageChooserBlock(ImageChooserBlock):
                 "medium": value.get_rendition("fill-1024x640").attrs_dict,
                 "thumbnail": value.get_rendition("fill-560x350").attrs_dict,
             }
+
+
+# =============== Rich Text Blocks ======================
 
 
 class CustomRichTextBlock(blocks.RichTextBlock):
@@ -62,6 +67,28 @@ class CustomLimitedRichTextBlock(blocks.RichTextBlock):
             label = "Limited Rich Text"
 
 
+class BoldAndLinkRichTextBlock(blocks.RichTextBlock):
+    """Rich text block with bold and link only. Specificaly for example sentences"""
+
+    def __init__(
+        self,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.max_length = 255
+        self.features = [
+            "bold",
+            "link",
+        ]
+
+        class Meta:
+            icon = "pilcrow"
+            label = "Example Sentence Text"
+
+
+# =============== Youtube  Blocks ======================
+
+
 class YoutubeBlock(blocks.StructBlock):
     """Block to add responsive imbeded youtube video"""
 
@@ -82,6 +109,9 @@ class YoutubeBlock(blocks.StructBlock):
     class Meta:
         icon = "desktop"
         label = "Youtube Block"
+
+
+# =============== Quote  Blocks ======================
 
 
 class BlockQuoteBlock(blocks.StructBlock):
@@ -132,6 +162,45 @@ class ListBlock(blocks.StructBlock):
     class Meta:
         icon = "list-ul"
         label = "List Block"
+
+
+# =============== Simple example sentences Blocks ======================
+
+
+class ExamplesListBlock(blocks.StructBlock):
+    """A block for a list of simple examples"""
+
+    sentences_list = blocks.ListBlock(BoldAndLinkRichTextBlock())
+
+    class Meta:
+        icon = "tasks"
+        label = "Example Sentences or Questions List"
+
+
+# =============== Wrong Right Example Blocks ======================
+class WrongRightBlock(blocks.StructBlock):
+    """A block for a single wrong and right sentence example"""
+
+    wrong = blocks.CharBlock(
+        max_length=255,
+    )
+    right = blocks.CharBlock(
+        max_length=255,
+    )
+
+    class Meta:
+        icon = "success"
+        label = "Wrong -> Right Block"
+
+
+class WrongRightListBlock(blocks.StructBlock):
+    """A block for a list of wrong right examples"""
+
+    wrong_right_list = blocks.ListBlock(WrongRightBlock())
+
+    class Meta:
+        icon = "tasks"
+        label = "Wrong -> Right List"
 
 
 # =============== Multiple Choice question Blocks ======================
@@ -255,7 +324,7 @@ class ConversationBlock(blocks.StructBlock):
     )
     person_two_name = blocks.CharBlock(
         max_length=10,
-        help_text="Secon person in conversation name, correlates to person two in following blocks.",
+        help_text="Second person in conversation name, correlates to person two in following blocks.",
     )
     conversation = blocks.ListBlock(TwoPersonLinesBlock())
 

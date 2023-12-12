@@ -69,7 +69,6 @@ class CourseRelatedFieldSerializer(Field):
         }
 
 
-@register_snippet
 class Course(TimeStampedModel):
     title_en = models.CharField(
         _("English Title"),
@@ -81,6 +80,13 @@ class Course(TimeStampedModel):
             "Subject should be included in the title. For example 'Advanced General English'. English will be the subject which also corresponds to the subject choice field"
         ),
     )
+    description = models.TextField(
+        _("Description"),
+        null=False,
+        blank=False,
+        max_length=300,
+        help_text=_("A brief description of the course for internal use"),
+    )
     subject = models.CharField(
         _("Subject"),
         null=False,
@@ -89,6 +95,14 @@ class Course(TimeStampedModel):
         max_length=20,
         default=SubjectChoices.ENGLISH,
         help_text="Required",
+    )
+    course_category = models.CharField(
+        _("Course Category"),
+        blank=False,
+        null=False,
+        default=CourseCategoryChoices.GENERAL,
+        choices=CourseCategoryChoices.choices,
+        help_text="Course category for the course, if in doubt make it general",
     )
 
     def __str__(self) -> str:
@@ -174,14 +188,6 @@ class CourseDisplayDetailPage(Page):
         null=False,
         help_text="Read only field that get's value from the 'course' field",
     )
-    course_category = models.PositiveSmallIntegerField(
-        _("Course Category"),
-        blank=False,
-        null=False,
-        default=CourseCategoryChoices.GENERAL,
-        choices=CourseCategoryChoices.choices,
-        help_text="Course category for the course, if in doubt make it general",
-    )
     level_from = models.PositiveSmallIntegerField(
         _("Level From"),
         blank=False,
@@ -226,7 +232,6 @@ class CourseDisplayDetailPage(Page):
                 FieldPanel("header_image"),
                 FieldPanel("subject_slug", read_only=True),
                 FieldPanel("display_intro"),
-                FieldPanel("course_category"),
                 FieldPanel("level_from"),
                 FieldPanel("level_to"),
             ],
@@ -259,7 +264,6 @@ class CourseDisplayDetailPage(Page):
         APIField("header_image", serializer=HeaderImageFieldSerializer()),
         APIField("subject_slug"),
         APIField("display_intro"),
-        APIField("course_category", serializer=CourseCategoryFieldSerializer()),
         APIField("level_from", serializer=LevelFieldsSerializer()),
         APIField("level_to", serializer=LevelFieldsSerializer()),
         APIField("course_content_points"),

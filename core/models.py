@@ -95,10 +95,10 @@ class LevelChoices(models.IntegerChoices):
     GRADE_5 = 13, "Grade 5,5級"
 
 
-class CourseCategoryChoices(models.IntegerChoices):
-    """Integer choices for categories of courses"""
+class CourseCategoryChoices(models.TextChoices):
+    """Text choices for categories of courses"""
 
-    GENERAL = 0, "General,日常"
-    BUSINESS = 1, "Business,ビジネス"
-    TEST_PREPARATION = 2, "Test Preparation,テスト対策"
-    WRITING = 3, "Writing, ライティング"
+    GENERAL = "general", "General,日常"
+    BUSINESS = "business", "Business,ビジネス"
+    TEST_PREPARATION = "test-preparation", "Test Preparation,テスト対策"
+    WRITING = "writing", "Writing,ライティング"

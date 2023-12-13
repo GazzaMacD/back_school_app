@@ -119,19 +119,83 @@ class CourseDisplayListPage(Page):
         max_length=100,
         help_text="Required. Max length 100 characters, 45 or less is ideal",
     )
+    display_tagline = models.CharField(
+        "Disply Tagline",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the courses in general",
+    )
+    # English
+    en_sec_title = models.CharField(
+        "English Section Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. In English please. Max length 100 characters, 45 or less is ideal",
+    )
+    en_sec_dis_title = models.CharField(
+        "English Section Display Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. In display language. Max length 100 characters, 45 or less is ideal",
+    )
+    en_sec_dis_tagline = models.CharField(
+        "English Section Display Tagline",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the english courses in general",
+    )
+    en_sec_pop_title = models.CharField(
+        "Popular English Courses Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 char in display language",
+    )
+    en_sec_other_title = models.CharField(
+        "Other English Courses Title",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 char in display language",
+    )
     # Admin panel configuration
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
             ],
-            heading="Course header section",
+            heading="Courses header section",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("en_sec_title"),
+                FieldPanel("en_sec_dis_title"),
+                FieldPanel("en_sec_pop_title"),
+                InlinePanel(
+                    "pop_en_courses",
+                    label="Popluar English Course",
+                    max_num=4,
+                ),
+                FieldPanel("en_sec_other_title"),
+            ],
+            heading="English Courses Section",
         ),
     ]
 
     # Api configuration
     api_fields = [
         APIField("display_title"),
+        APIField("display_tagline"),
+        APIField("en_sec_title"),
+        APIField("en_sec_dis_title"),
+        APIField("en_sec_pop_title"),
+        APIField("pop_en_courses"),
+        APIField("en_sec_other_title"),
     ]
 
     # Page limitations, Meta and methods
@@ -142,8 +206,8 @@ class CourseDisplayListPage(Page):
 
     # meta and other class attributes
     class Meta:
-        verbose_name = "Course Display List Page"
-        verbose_name_plural = "Course Display List Pages"
+        verbose_name = "Course List Page"
+        verbose_name_plural = "Courses List Pages"
 
     def __str__(self):
         return self.title
@@ -298,12 +362,39 @@ class CourseDisplayDetailPage(Page):
             self.slug = slugify(self.course.title_en)
 
 
+# =============== Orderables ====================
+
+
+class PopularEnglishCourse(Orderable):
+    """Orderable field for popular engish courses for the list page"""
+
+    page = ParentalKey(
+        CourseDisplayListPage,
+        on_delete=models.CASCADE,
+        related_name="pop_en_courses",
+    )
+    course = models.ForeignKey(
+        "courses.CourseDisplayDetailPage",
+        on_delete=models.CASCADE,
+        limit_choices_to={"subject_slug": "english"},
+    )
+
+    panels = [
+        FieldPanel("course"),
+    ]
+
+    api_fields = [
+        APIField("course", serializer=CourseRelatedFieldSerializer()),
+    ]
+
+
 class RelatedCourse(Orderable):
     """Orderable field for other courses that may be connected to this course"""
 
     page = ParentalKey(
         CourseDisplayDetailPage,
         on_delete=models.CASCADE,
+        blank=True,
         related_name="related_courses",
     )
     course = models.ForeignKey(

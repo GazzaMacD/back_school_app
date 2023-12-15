@@ -2,6 +2,23 @@ from wagtail import blocks
 
 from wagtail.images.blocks import ImageChooserBlock
 
+# =============== Simple Char Blocks ======================
+
+
+class ShortCharBlock(blocks.StructBlock):
+    """Block for lists with simple char field of 20 chars long"""
+
+    text = blocks.CharBlock(
+        required=True,
+        max_length=20,
+        help_text="Required. Max length 20 chars",
+    )
+
+    class Meta:
+        icon = "pilcrow"
+        label = "Short Text"
+
+
 # =============== Image Blocks ======================
 
 

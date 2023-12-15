@@ -28,7 +28,9 @@ class CourseFieldSerializer(Field):
             "id": value.id,
             "title_en": value.title_en,
             "subject": value.subject,
-            "display": value.get_subject_display(),
+            "subject_display": value.get_subject_display(),
+            "course_category": value.course_category,
+            "course_category_display": value.get_course_category_display(),
         }
 
 
@@ -55,7 +57,7 @@ class CourseRelatedFieldSerializer(Field):
             "id": value.id,
             "title": value.title,
             "display_title": value.display_title,
-            "display_intro": value.display_intro,
+            "display_tagline": value.display_tagline,
             "slug": value.slug,
             "subject_slug": value.subject_slug,
             "subject_display": value.course.get_subject_display(),
@@ -223,13 +225,20 @@ class CourseDisplayDetailPage(Page):
         max_length=100,
         help_text="Required. Max length 100 characters, 45 or less is ideal",
     )
+    display_tagline = models.CharField(
+        "Disply Tagline",
+        blank=False,
+        null=False,
+        max_length=160,
+        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the course",
+    )
     course = models.OneToOneField(
         "courses.Course",
         on_delete=models.SET_NULL,
         blank=False,
         null=True,
         related_name="course_detail_page",
-        help_text="The associated course",
+        help_text="The associated course, the page title should match exactly the name of this course",
     )
     header_image = models.ForeignKey(
         "wagtailimages.Image",
@@ -238,13 +247,6 @@ class CourseDisplayDetailPage(Page):
         null=True,
         related_name="+",
         help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
-    )
-    display_intro = models.TextField(
-        "Display Introduction",
-        blank=False,
-        null=False,
-        max_length=150,
-        help_text="Required. Max length 150.",
     )
     subject_slug = models.SlugField(
         "Subect Slug",
@@ -270,7 +272,7 @@ class CourseDisplayDetailPage(Page):
     # Page content section fields
     course_content_points = StreamField(
         [
-            ("listblock", customblocks.ListBlock()),
+            ("short_text_block", customblocks.ShortCharBlock()),
         ],
         use_json_field=True,
         null=True,
@@ -292,10 +294,10 @@ class CourseDisplayDetailPage(Page):
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
                 FieldPanel("course"),
                 FieldPanel("header_image"),
                 FieldPanel("subject_slug", read_only=True),
-                FieldPanel("display_intro"),
                 FieldPanel("level_from"),
                 FieldPanel("level_to"),
             ],
@@ -324,10 +326,10 @@ class CourseDisplayDetailPage(Page):
     # Api configuration
     api_fields = [
         APIField("display_title"),
+        APIField("display_tagline"),
         APIField("course", serializer=CourseFieldSerializer()),
         APIField("header_image", serializer=HeaderImageFieldSerializer()),
         APIField("subject_slug"),
-        APIField("display_intro"),
         APIField("level_from", serializer=LevelFieldsSerializer()),
         APIField("level_to", serializer=LevelFieldsSerializer()),
         APIField("course_content_points"),

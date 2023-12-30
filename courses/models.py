@@ -102,6 +102,7 @@ class Course(TimeStampedModel):
         _("Course Category"),
         blank=False,
         null=False,
+        max_length=20,
         default=CourseCategoryChoices.GENERAL,
         choices=CourseCategoryChoices.choices,
         help_text="Course category for the course, if in doubt make it general",

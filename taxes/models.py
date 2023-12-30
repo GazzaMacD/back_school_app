@@ -25,6 +25,7 @@ class Tax(TimeStampedModel):
         _("Tax Type"),
         null=False,
         blank=False,
+        max_length=2,
         default=TaxTypeChoices.CONSUMPTION,
         choices=TaxTypeChoices.choices,
         help_text="Required",

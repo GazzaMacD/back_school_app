@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("wagtailcore", "0091_alter_page_title"),
+        #("wagtailcore", "0091_alter_page_title"),
     ]
 
     operations = [

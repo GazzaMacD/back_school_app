@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("wagtailcore", "0090_alter_page_title"),
+        #("wagtailcore", "0090_alter_page_title"),
         ("staff", "0007_staffdetailpage_hobbies_staffdetailpage_role_and_more"),
     ]
 

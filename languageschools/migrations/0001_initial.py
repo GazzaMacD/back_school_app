@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("addresses", "0007_address_is_learning_center"),
         ("wagtailimages", "0025_alter_image_file_alter_rendition_file"),
-        ("wagtailcore", "0091_alter_page_title"),
+        #("wagtailcore", "0091_alter_page_title"),
     ]
 
     operations = [

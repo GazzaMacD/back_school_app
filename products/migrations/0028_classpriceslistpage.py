@@ -8,7 +8,7 @@ import wagtail_headless_preview.models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("wagtailcore", "0091_alter_page_title"),
+        #("wagtailcore", "0091_alter_page_title"),
         ("products", "0027_productservice_class_delivery_and_more"),
     ]
 

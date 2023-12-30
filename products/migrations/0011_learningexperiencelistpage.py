@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("wagtailcore", "0091_alter_page_title"),
+        #("wagtailcore", "0091_alter_page_title"),
         ("products", "0010_learningexperience_and_more"),
     ]
 

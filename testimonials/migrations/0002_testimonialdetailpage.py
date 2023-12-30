@@ -11,7 +11,7 @@ import wagtail_headless_preview.models
 class Migration(migrations.Migration):
     dependencies = [
         ("wagtailimages", "0025_alter_image_file_alter_rendition_file"),
-        ("wagtailcore", "0091_alter_page_title"),
+        #("wagtailcore", "0091_alter_page_title"),
         ("testimonials", "0001_initial"),
     ]
 

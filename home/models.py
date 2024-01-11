@@ -34,7 +34,32 @@ class HomePage(HeadlessMixin, Page):
         related_name="+",
         help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
     )
-    why_content = RichTextField(features=["bold"])
+    why_content = RichTextField(
+        features=["bold"],
+    )
+    service_en_title = models.CharField(
+        "Services - English Title",
+        blank=False,
+        null=False,
+        help_text="Required.",
+    )
+    service_jp_title = models.CharField(
+        "Services - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
+    service_cards = StreamField(
+        [
+            ("square_pic_cards", customblocks.SquarePicCardBlock(label="Service Card")),
+        ],
+        block_counts={
+            "square_pic_cards": {"max_num": 4},
+        },
+        use_json_field=True,
+        blank=True,
+    )
 
     # Admin panel configuration
     content_panels = Page.content_panels + [
@@ -47,6 +72,14 @@ class HomePage(HeadlessMixin, Page):
             ],
             heading="Why learn with us",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("service_en_title"),
+                FieldPanel("service_jp_title"),
+                FieldPanel("service_cards"),
+            ],
+            heading="Our services",
+        ),
     ]
 
     # Api configuration
@@ -55,6 +88,9 @@ class HomePage(HeadlessMixin, Page):
         APIField("why_jp_title"),
         APIField("why_image", serializer=HeaderImageFieldSerializer()),
         APIField("why_content"),
+        APIField("service_en_title"),
+        APIField("service_jp_title"),
+        APIField("service_cards"),
     ]
 
     # Page limitations

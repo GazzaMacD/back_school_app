@@ -36,6 +36,20 @@ class CustomImageChooserBlock(ImageChooserBlock):
             }
 
 
+class CustomSquareImageChooserBlock(ImageChooserBlock):
+    """Customize api json response to include url string to image and thumbnail. Images are of 1/1 aspect ratio."""
+
+    def get_api_representation(self, value, context=None):
+        if value:
+            return {
+                "id": value.id,
+                "title": value.title,
+                "original": value.get_rendition("original").attrs_dict,
+                "medium": value.get_rendition("fill-1024x1024").attrs_dict,
+                "thumbnail": value.get_rendition("fill-560x560").attrs_dict,
+            }
+
+
 # =============== Rich Text Blocks ======================
 
 
@@ -307,6 +321,33 @@ class InfoCardSeriesBlock(blocks.StructBlock):
     """A block for a series of cards"""
 
     cards = blocks.ListBlock(InfoCardBlock())
+
+
+class SquarePicCardBlock(blocks.StructBlock):
+    """A block for card with square image, title, text and optional url"""
+
+    image = CustomSquareImageChooserBlock(
+        required=True,
+        help_text="Image size: 2048px x 2048px (1/1 ratio). Please optimize image before uploading.",
+    )
+    title = blocks.CharBlock(
+        required=True,
+        max_length=25,
+        help_text="Title for card. Max length 25",
+    )
+    text = blocks.TextBlock(
+        required=True,
+        max_length=150,
+        help_text="Text for card. Max length 150",
+    )
+    link = blocks.CharBlock(
+        required=False,
+        max_length=150,
+        help_text="Link url. Not required",
+    )
+
+    class Meta:
+        icon = "doc-full"
 
 
 # =============== Conversation Blocks ======================

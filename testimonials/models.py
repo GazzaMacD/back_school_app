@@ -5,20 +5,32 @@ from rest_framework.fields import Field
 from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.models import Page
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
-from wagtail.fields import StreamField
+from wagtail.fields import StreamField, RichTextField
 from wagtail.api import APIField
 
 from streams import customblocks
 from django.db import models
 
 
-class CustomerImageSerializer(Field):
+class CustomerSquareImageSerializer(Field):
     def to_representation(self, value):
         return {
             "id": value.id,
             "title": value.title,
             "original": value.get_rendition("original").attrs_dict,
+            "medium": value.get_rendition("fill-740x740").attrs_dict,
             "thumbnail": value.get_rendition("fill-400x400").attrs_dict,
+        }
+
+
+class CustomerPortraitImageSerializer(Field):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "title": value.title,
+            "original": value.get_rendition("original").attrs_dict,
+            "medium": value.get_rendition("fill-1400x1800").attrs_dict,
+            "thumbnail": value.get_rendition("fill-560x720").attrs_dict,
         }
 
 
@@ -81,20 +93,28 @@ class TestimonialDetailPage(HeadlessMixin, Page):
         max_length=100,
         help_text="Required. Max length 100 chars",
     )
-    customer_image = models.ForeignKey(
+    customer_square_image = models.ForeignKey(
         "wagtailimages.Image",
         on_delete=models.SET_NULL,
         blank=False,
         null=True,
         related_name="+",
-        help_text="Image size: 1080px x 1080px. Please optimize image size before uploading.",
+        help_text="Image size: 1080px x 1080px (1:1). Please optimize image size before uploading.",
+    )
+    customer_portrait_image = models.ForeignKey(
+        "wagtailimages.Image",
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+        related_name="+",
+        help_text="Image size: 1400 x 1800px (7:9). Please optimize image size before uploading.",
     )
     occupation = models.CharField(
         "Occupation of customer",
-        blank=False,
+        blank=True,
         null=False,
         max_length=100,
-        help_text="Required. Max length 100 chars",
+        help_text="Not required. Max length 100 chars",
     )
     organization_name = models.CharField(
         "Organization affiliated with",
@@ -116,12 +136,20 @@ class TestimonialDetailPage(HeadlessMixin, Page):
         default=timezone.now,
         help_text="IMPORTANT NOTE: This date will affect the order on list pages.",
     )
-    comment = models.TextField(
-        "Short Comment",
+    lead_sentence = models.CharField(
+        "Lead Sentence",
         blank=True,
         null=False,
+        max_length=30,
+        help_text="Required. 30char max. One small sentence to describe their feeling about the company",
+    )
+    comment = RichTextField(
+        "Short Comment",
+        blank=False,
+        null=False,
         max_length=300,
-        help_text="Required. Max length 300 chars. A short comment about the school to display in places on site.",
+        features=["bold"],
+        help_text="Required. Max length 300 chars. A short comment about the company to display in places on site.",
     )
     customer_interview = StreamField(
         [
@@ -138,7 +166,8 @@ class TestimonialDetailPage(HeadlessMixin, Page):
         MultiFieldPanel(
             [
                 FieldPanel("customer_name"),
-                FieldPanel("customer_image"),
+                FieldPanel("customer_square_image"),
+                FieldPanel("customer_portrait_image"),
                 FieldPanel("occupation"),
                 FieldPanel("organization_name"),
                 FieldPanel("organization_url"),
@@ -148,6 +177,7 @@ class TestimonialDetailPage(HeadlessMixin, Page):
         ),
         MultiFieldPanel(
             [
+                FieldPanel("lead_sentence"),
                 FieldPanel("comment"),
                 FieldPanel("customer_interview"),
             ],
@@ -158,7 +188,10 @@ class TestimonialDetailPage(HeadlessMixin, Page):
     # Api configuration
     api_fields = [
         APIField("customer_name"),
-        APIField("customer_image", serializer=CustomerImageSerializer()),
+        APIField("customer_square_image", serializer=CustomerSquareImageSerializer()),
+        APIField(
+            "customer_portrait_image", serializer=CustomerPortraitImageSerializer()
+        ),
         APIField("occupation"),
         APIField("organization_name"),
         APIField("organization_url"),

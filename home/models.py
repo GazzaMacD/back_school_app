@@ -141,6 +141,7 @@ class HomeTestimonialSerializer(Field):
         img = value.customer_portrait_image
         return {
             "id": value.id,
+            "slug": value.slug,
             "title": value.title,
             "customer_name": value.customer_name,
             "occupation": value.occupation,

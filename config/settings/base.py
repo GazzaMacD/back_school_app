@@ -260,4 +260,8 @@ SIMPLE_JWT = {
 # Base URL to use when referring to full URLs within the Wagtail admin backend - # e.g. in notification emails. Don't include '/admin' or a trailing slash
 WAGTAILADMIN_BASE_URL = "http://example.com"
 
+# auto field for id settings
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+
 AUTH_USER_MODEL = "users.CustomUser"

@@ -138,8 +138,19 @@ class HomePage(HeadlessMixin, Page):
 
 class HomeTestimonialSerializer(Field):
     def to_representation(self, value):
+        img = value.customer_portrait_image
         return {
             "id": value.id,
+            "title": value.title,
+            "customer_name": value.customer_name,
+            "occupation": value.occupation,
+            "lead_sentence": value.lead_sentence,
+            "comment": value.comment,
+            "image": {
+                "id": img.id,
+                "title": img.title,
+                "medium": img.get_rendition("fill-1400x1800").attrs_dict,
+            },
         }
 
 

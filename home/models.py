@@ -1,5 +1,7 @@
-from django.db import models
+from decimal import Decimal
 
+from django.db import models
+from django.utils import timezone
 from rest_framework.fields import Field
 from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.models import Page, Orderable
@@ -79,6 +81,21 @@ class HomePage(HeadlessMixin, Page):
         max_length=20,
         help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
+    # prices section fields
+    price_en_title = models.CharField(
+        "Class Prices - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    price_jp_title = models.CharField(
+        "Class Prices - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
 
     # Admin panel configuration
     content_panels = Page.content_panels + [
@@ -112,6 +129,19 @@ class HomePage(HeadlessMixin, Page):
             ],
             heading="Testimonials",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("price_en_title"),
+                FieldPanel("price_jp_title"),
+                InlinePanel(
+                    "home_class_prices",
+                    label="Class Prices",
+                    max_num=5,
+                    help_text="Choose 5 prices for this section please. Max 5.",
+                ),
+            ],
+            heading="Class Prices",
+        ),
     ]
 
     # Api configuration
@@ -126,6 +156,9 @@ class HomePage(HeadlessMixin, Page):
         APIField("testimonial_en_title"),
         APIField("testimonial_jp_title"),
         APIField("home_testimonials"),
+        APIField("price_en_title"),
+        APIField("price_jp_title"),
+        APIField("home_class_prices"),
     ]
 
     # Page limitations
@@ -136,6 +169,7 @@ class HomePage(HeadlessMixin, Page):
         return self.title
 
 
+# Testimonials section for home page
 class HomeTestimonialSerializer(Field):
     def to_representation(self, value):
         img = value.customer_portrait_image
@@ -177,3 +211,84 @@ class HomeTestimonials(Orderable):
 
     def __str__(self):
         return self.testimonial.title
+
+
+# Prices section for home page
+
+
+class HomeClassPriceSerializer(Field):
+    def calculate_taxed_amount(self, price, tax_rate):
+        if not isinstance(price, Decimal) or not isinstance(tax_rate, Decimal):
+            return None
+        return str(round(price + (price * (tax_rate / Decimal("100.00")))))
+
+    def get_price(self, prices, tax_rate):
+        filtered_prices = []
+        now = int(timezone.now().timestamp())
+        for price in prices:
+            if now < int(price.start_date.timestamp()):
+                continue
+            if price.end_date and now > int(price.end_date.timestamp()):
+                continue
+            filtered_prices.append(price)
+        filtered_prices.sort(reverse=True, key=lambda x: x.start_date)
+        if len(filtered_prices) > 0:
+            p = filtered_prices[0]
+            return {
+                "name": p.name,
+                "display_name": p.display_name,
+                "pretax_price": str(p.price),
+                "posttax_price": self.calculate_taxed_amount(p.price, tax_rate),
+                "is_sale": p.is_limited_sale,
+                "start_date": p.start_date,
+                "is_limited_sale": p.is_limited_sale,
+                "before_sale_pretax_price": str(p.before_sale_price),
+                "before_sale_posttax_price": self.calculate_taxed_amount(
+                    p.before_sale_price, tax_rate
+                ),
+                "end_date": p.end_date,
+            }
+        return {}
+
+    def to_representation(self, value):
+        cs = value.class_service
+        return {
+            "id": value.id,
+            "slug": value.slug,
+            "title": value.title,
+            "display_title": value.display_title,
+            "length": cs.length,
+            "length_unit": cs.get_length_unit_display(),
+            "quantity": cs.quantity,
+            "quantity_unit": cs.get_quantity_unit_display(),
+            "is_native": cs.is_native,
+            "is_online": cs.is_online,
+            "is_inperson": cs.is_inperson,
+            "has_onlinenotes": cs.has_onlinenotes,
+            "bookable_online": cs.bookable_online,
+            "price_info": self.get_price(cs.prices.all(), cs.tax_rate.rate),
+        }
+
+
+class HomePrices(Orderable):
+    """Orderable field for class prices chosen for display on home page"""
+
+    page = ParentalKey(
+        HomePage,
+        on_delete=models.CASCADE,
+        related_name="home_class_prices",
+    )
+    class_price = models.ForeignKey(
+        "products.ClassPricesDetailPage", on_delete=models.CASCADE
+    )
+
+    panels = [
+        FieldPanel("class_price"),
+    ]
+
+    api_fields = [
+        APIField("class_price", serializer=HomeClassPriceSerializer()),
+    ]
+
+    def __str__(self):
+        return self.class_price.title

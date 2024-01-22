@@ -261,6 +261,7 @@ class HomeClassPriceSerializer(Field):
             "length_unit": cs.get_length_unit_display(),
             "quantity": cs.quantity,
             "quantity_unit": cs.get_quantity_unit_display(),
+            "max_num": cs.max_num,
             "is_native": cs.is_native,
             "is_online": cs.is_online,
             "is_inperson": cs.is_inperson,

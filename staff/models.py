@@ -111,12 +111,26 @@ class StaffDetailPage(HeadlessMixin, Page):
         related_name="+",
         help_text="Image size: 1080px x 1080px. Please optimize image size before uploading.",
     )
+    display_name = models.CharField(
+        "Display Name",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25 characters. Staff name as they would like it displayed to the public and in the appropriate langauge",
+    )
+    display_tagline = models.CharField(
+        "Display Tagline",
+        blank=False,
+        null=False,
+        max_length=50,
+        help_text="Required. Max length 50 characters, 45 or less is ideal. Attractive ,one sentence summary of staff member, shorter than intro.",
+    )
     intro = models.TextField(
         "Intro",
         blank=False,
         null=False,
         max_length=200,
-        help_text="Required.",
+        help_text="Required. Intro with max 200 char length. To be shown on the detail page for the staff member",
     )
     role = models.CharField(
         "Roles in company",
@@ -162,6 +176,8 @@ class StaffDetailPage(HeadlessMixin, Page):
             [
                 FieldPanel("member"),
                 FieldPanel("profile_image"),
+                FieldPanel("display_name"),
+                FieldPanel("display_tagline"),
                 FieldPanel("intro"),
                 FieldPanel("role"),
                 FieldPanel("country"),
@@ -183,6 +199,8 @@ class StaffDetailPage(HeadlessMixin, Page):
     api_fields = [
         APIField("member", serializer=MemberFieldSerializer()),
         APIField("profile_image", serializer=StaffProfileImageSerializer()),
+        APIField("display_name"),
+        APIField("display_tagline"),
         APIField("intro"),
         APIField("role"),
         APIField("country"),

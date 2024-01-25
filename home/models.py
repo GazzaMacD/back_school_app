@@ -338,6 +338,8 @@ class HomeTeacherSerializer(Field):
             "id": value.id,
             "slug": value.slug,
             "title": value.title,
+            "display_name": value.display_name,
+            "display_tagline": value.display_tagline,
             "image": {
                 "id": img.id,
                 "title": img.title,

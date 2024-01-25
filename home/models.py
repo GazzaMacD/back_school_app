@@ -96,6 +96,21 @@ class HomePage(HeadlessMixin, Page):
         max_length=20,
         help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
+    # teacher section fields
+    teacher_en_title = models.CharField(
+        "Teachers - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    teacher_jp_title = models.CharField(
+        "Teachers - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
 
     # Admin panel configuration
     content_panels = Page.content_panels + [
@@ -142,6 +157,19 @@ class HomePage(HeadlessMixin, Page):
             ],
             heading="Class Prices",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("teacher_en_title"),
+                FieldPanel("teacher_jp_title"),
+                InlinePanel(
+                    "home_teachers",
+                    label="Teachers",
+                    max_num=4,
+                    help_text="Choose 4 teachers for this section please. Max 4.",
+                ),
+            ],
+            heading="Teachers",
+        ),
     ]
 
     # Api configuration
@@ -159,6 +187,9 @@ class HomePage(HeadlessMixin, Page):
         APIField("price_en_title"),
         APIField("price_jp_title"),
         APIField("home_class_prices"),
+        APIField("teacher_en_title"),
+        APIField("teacher_jp_title"),
+        APIField("home_teachers"),
     ]
 
     # Page limitations
@@ -293,3 +324,49 @@ class HomePrices(Orderable):
 
     def __str__(self):
         return self.class_price.title
+
+
+##
+# Teachers Orderable and field serializer
+#
+
+
+class HomeTeacherSerializer(Field):
+    def to_representation(self, value):
+        img = value.profile_image
+        return {
+            "id": value.id,
+            "slug": value.slug,
+            "title": value.title,
+            "image": {
+                "id": img.id,
+                "title": img.title,
+                "original": img.get_rendition("original").attrs_dict,
+                "thumbnail": img.get_rendition("fill-400x400").attrs_dict,
+            },
+        }
+
+
+class HomeTeachers(Orderable):
+    """Orderable field for chosen teachers display on home page"""
+
+    page = ParentalKey(
+        HomePage,
+        on_delete=models.CASCADE,
+        related_name="home_teachers",
+    )
+    teacher = models.ForeignKey(
+        "staff.StaffDetailPage",
+        on_delete=models.CASCADE,
+    )
+
+    panels = [
+        FieldPanel("teacher"),
+    ]
+
+    api_fields = [
+        APIField("teacher", serializer=HomeTeacherSerializer()),
+    ]
+
+    def __str__(self):
+        return self.teacher.title

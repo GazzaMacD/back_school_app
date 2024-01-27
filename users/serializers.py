@@ -42,9 +42,7 @@ class CustomUserContactNameSerializer(serializers.ModelSerializer):
 
 
 class CustomLoginSerializer(serializers.Serializer):
-    """Login serializer from dj-rest-auth==4.0.1. Minimal changes other
-    than messages changed from English to Japanese.
-    """
+    """Login serializer from dj-rest-auth==4.0.1. Japanese validation messages"""
 
     username = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(

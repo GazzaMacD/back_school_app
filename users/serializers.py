@@ -3,9 +3,14 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import Group
 from django.urls import exceptions as url_exceptions
 from django.utils.translation import gettext_lazy as _
-from dj_rest_auth.serializers import UserDetailsSerializer, PasswordResetSerializer
+from dj_rest_auth.serializers import (
+    UserDetailsSerializer,
+    PasswordResetSerializer,
+    PasswordResetConfirmSerializer,
+)
 from rest_framework import serializers
 from rest_framework import exceptions, serializers
+from rest_framework.exceptions import ValidationError
 
 from contacts.serializers import ContactUserSerializer
 from .models import CustomUser
@@ -194,3 +199,32 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
             "required": "Eメールアドレスを入力してください",
         },
     )
+
+
+class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
+    """
+    Custom serializer for confirming a password reset attempt with japanese error messages.
+    """
+
+    new_password1 = serializers.CharField(
+        max_length=128,
+        error_messages={
+            "blank": "パスワードを入力してください",
+            "required": "パスワードを入力してください",
+            "max_length": "このフィールドの文字数が{max_length}を超えないようにしてください",
+            "invalid": "有効な文字列ではありません",
+        },
+    )
+    new_password2 = serializers.CharField(
+        max_length=128,
+        error_messages={
+            "blank": "パスワードを入力してください",
+            "required": "パスワードを入力してください",
+            "max_length": "このフィールドの文字数が{max_length}を超えないようにしてください",
+            "invalid": "有効な文字列ではありません",
+        },
+    )
+
+    def custom_validation(self, attrs):
+        if attrs["new_password1"] != attrs["new_password2"]:
+            raise ValidationError({"new_password2": [_("2つのパスワードフィールドが一致しない")]})

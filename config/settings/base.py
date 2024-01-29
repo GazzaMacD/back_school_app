@@ -248,6 +248,7 @@ REST_AUTH = {
     "USER_DETAILS_SERIALIZER": "users.serializers.CustomUserDetailsSerializer",
     "LOGIN_SERIALIZER": "users.serializers.CustomLoginSerializer",
     "PASSWORD_RESET_SERIALIZER": "users.serializers.CustomPasswordResetSerializer",
+    "PASSWORD_RESET_CONFIRM_SERIALIZER": "users.serializers.CustomPasswordResetConfirmSerializer",
     "PASSWORD_RESET_USE_SITES_DOMAIN": True,
     "OLD_PASSWORD_FIELD_ENABLED": True,
 }

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import Group
 from django.urls import exceptions as url_exceptions
 from django.utils.translation import gettext_lazy as _
-from dj_rest_auth.serializers import UserDetailsSerializer
+from dj_rest_auth.serializers import UserDetailsSerializer, PasswordResetSerializer
 from rest_framework import serializers
 from rest_framework import exceptions, serializers
 
@@ -179,3 +179,18 @@ class CustomLoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+
+
+class CustomPasswordResetSerializer(PasswordResetSerializer):
+    """
+    Custom serializer for requesting a password reset e-mail with
+    japanese error messages.
+    """
+
+    email = serializers.EmailField(
+        error_messages={
+            "invalid": "有効なEメールアドレスを入力してください",
+            "blank": "Eメールアドレスを入力してください",
+            "required": "Eメールアドレスを入力してください",
+        },
+    )

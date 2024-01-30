@@ -213,10 +213,32 @@ WAGTAILSEARCH_BACKENDS = {
     }
 }
 
+# Auth Validators
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "users.validators.CustomUserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "users.validators.CustomMinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 15,
+        },
+    },
+    {
+        "NAME": "users.validators.CustomCommonPasswordValidator",
+    },
+    {
+        "NAME": "users.validators.CustomNumericPasswordValidator",
+    },
+]
+
 # DRF Settings
 SAFE_IPS = [
     "127.0.0.1",
 ]
+
+# Auth validators
+
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [

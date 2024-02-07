@@ -48,8 +48,14 @@ class LessonRelatedFieldSerializer(Field):
             "id": value.id,
             "title": value.title,
             "display_title": value.display_title,
+            "published_date": value.published_date,
             "display_tagline": value.display_tagline,
             "slug": value.slug,
+            "category": {
+                "name": value.category.name,
+                "ja_name": value.category.ja_name,
+                "slug": value.category.slug,
+            },
             "image": {
                 "id": image.id,
                 "title": image.title,
@@ -113,7 +119,6 @@ class LessonListPage(HeadlessMixin, Page):
 
 
 class LessonDetailPage(HeadlessMixin, Page):
-
     """Lesson Detail page with variable content options provided by stream fields"""
 
     # Page header fields

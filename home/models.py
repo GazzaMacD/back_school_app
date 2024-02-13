@@ -111,6 +111,21 @@ class HomePage(HeadlessMixin, Page):
         max_length=20,
         help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
+    # blog lesson section fields
+    bloglesson_en_title = models.CharField(
+        "Blog Lessons - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    bloglesson_jp_title = models.CharField(
+        "Blog Lessons - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
 
     # Admin panel configuration
     content_panels = Page.content_panels + [
@@ -170,6 +185,13 @@ class HomePage(HeadlessMixin, Page):
             ],
             heading="Teachers",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("bloglesson_en_title"),
+                FieldPanel("bloglesson_jp_title"),
+            ],
+            heading="Blog Lessons",
+        ),
     ]
 
     # Api configuration
@@ -190,6 +212,8 @@ class HomePage(HeadlessMixin, Page):
         APIField("teacher_en_title"),
         APIField("teacher_jp_title"),
         APIField("home_teachers"),
+        APIField("bloglesson_en_title"),
+        APIField("bloglesson_jp_title"),
     ]
 
     # Page limitations

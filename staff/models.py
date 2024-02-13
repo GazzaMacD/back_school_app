@@ -146,7 +146,7 @@ class StaffDetailPage(HeadlessMixin, Page):
         max_length=60,
         help_text="Required. Max length 60 chars",
     )
-    native_language = models.OneToOneField(
+    native_language = models.ForeignKey(
         "core.Language",
         on_delete=models.PROTECT,
         blank=False,

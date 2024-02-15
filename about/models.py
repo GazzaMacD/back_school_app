@@ -18,7 +18,7 @@ class StaffMembersFieldSerializer(Field):
             "name": value.title,
             "slug": value.slug,
             "position": value.role,
-            "intro": value.intro,
+            "display_tagline": value.display_tagline,
             "image": {
                 "id": image.id,
                 "title": image.title,

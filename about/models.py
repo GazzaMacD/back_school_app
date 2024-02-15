@@ -63,19 +63,19 @@ class AboutPage(HeadlessMixin, Page):
     )
 
     # Staff section
-    staff_title = models.CharField(
-        "Staff Title",
+    staff_en_title = models.CharField(
+        "Staff - English Title",
         blank=False,
         null=False,
-        max_length=15,
-        help_text="Required. Max length 15 characters.",
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
     )
-    staff_tagline = models.CharField(
-        "Staff Tagline",
+    staff_jp_title = models.CharField(
+        "Staff - Japanese Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters. Japanese",
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
 
     # Core values section
@@ -145,8 +145,8 @@ class AboutPage(HeadlessMixin, Page):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("staff_title"),
-                FieldPanel("staff_tagline"),
+                FieldPanel("staff_en_title"),
+                FieldPanel("staff_jp_title"),
                 InlinePanel("staff_members", label="Staff Member"),
             ],
             heading="Staff Section",
@@ -175,8 +175,8 @@ class AboutPage(HeadlessMixin, Page):
         APIField("mission_en_title"),
         APIField("mission_jp_title"),
         APIField("mission_content"),
-        APIField("staff_title"),
-        APIField("staff_tagline"),
+        APIField("staff_en_title"),
+        APIField("staff_jp_title"),
         APIField("staff_members"),
         APIField("values_title"),
         APIField("values_tagline"),

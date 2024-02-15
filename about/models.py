@@ -40,19 +40,19 @@ class AboutPage(HeadlessMixin, Page):
         help_text="Required. Max length 15 characters. English",
     )
     # Mission section
-    mission_title = models.CharField(
+    mission_en_title = models.CharField(
         "Mission Title",
         blank=False,
         null=False,
-        max_length=15,
-        help_text="Required. Max length 15 characters.",
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
     )
-    mission_tagline = models.CharField(
-        "Mission Tagline",
+    mission_jp_title = models.CharField(
+        "Mission - Japanese Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters. Japanese",
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
     mission_content = models.TextField(
         "Mission Content",
@@ -137,8 +137,8 @@ class AboutPage(HeadlessMixin, Page):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("mission_title"),
-                FieldPanel("mission_tagline"),
+                FieldPanel("mission_en_title"),
+                FieldPanel("mission_jp_title"),
                 FieldPanel("mission_content"),
             ],
             heading="Mission Section",
@@ -172,8 +172,8 @@ class AboutPage(HeadlessMixin, Page):
     # API Section
     api_fields = [
         APIField("display_title"),
-        APIField("mission_title"),
-        APIField("mission_tagline"),
+        APIField("mission_en_title"),
+        APIField("mission_jp_title"),
         APIField("mission_content"),
         APIField("staff_title"),
         APIField("staff_tagline"),

@@ -17,20 +17,16 @@ from streams import customblocks
 class ContactPage(HeadlessMixin, Page):
     """Page for contact information as well as joining process"""
 
-    ja_title = models.CharField(
-        "Japanese Title",
+    # Header section
+    display_title = models.CharField(
+        "Display Title",
         blank=False,
         null=False,
         max_length=15,
-        help_text="Required. Max length 15 characters.",
+        help_text="Required. Max length 15 characters. Japanese",
     )
-    short_intro = models.CharField(
-        "Short Intro",
-        blank=False,
-        null=False,
-        max_length=90,
-        help_text="A  oneline introduction of what this page is about. Max length 90 chars",
-    )
+
+    # Trial lesson section
     assessment_trial = StreamField(
         [
             ("rich_text", customblocks.CustomRichTextBlock()),
@@ -63,10 +59,9 @@ class ContactPage(HeadlessMixin, Page):
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
-                FieldPanel("ja_title"),
-                FieldPanel("short_intro"),
+                FieldPanel("display_title"),
             ],
-            heading="Contact page header area",
+            heading="Header area",
         ),
         MultiFieldPanel(
             [
@@ -80,8 +75,7 @@ class ContactPage(HeadlessMixin, Page):
 
     # Api configuration
     api_fields = [
-        APIField("ja_title"),
-        APIField("short_intro"),
+        APIField("display_title"),
         APIField("assessment_trial"),
         APIField("join_experience"),
         APIField("question_and_answer"),

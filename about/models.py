@@ -38,7 +38,7 @@ class AboutPage(HeadlessMixin, Page):
         blank=False,
         null=False,
         max_length=15,
-        help_text="Required. Max length 15 characters. English",
+        help_text="Required. Max length 15 characters. Japanese",
     )
     # Mission section
     mission_en_title = models.CharField(

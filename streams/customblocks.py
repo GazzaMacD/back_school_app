@@ -303,8 +303,8 @@ class InfoCardBlock(blocks.StructBlock):
 
     title = blocks.CharBlock(
         required=True,
-        max_length=20,
-        help_text="Title for card. Max length 20",
+        max_length=14,
+        help_text="English title for card. Max length 14",
     )
     image = CustomImageChooserBlock(
         required=True,
@@ -315,6 +315,34 @@ class InfoCardBlock(blocks.StructBlock):
         max_length=100,
         help_text="Text for card. Max length 100",
     )
+
+
+class InfoCardBlockBilingual(blocks.StructBlock):
+    """A block for card with title, jp title, image and text"""
+
+    title = blocks.CharBlock(
+        required=True,
+        max_length=14,
+        help_text="English title for card. Max length 14",
+    )
+    jp_title = blocks.CharBlock(
+        required=True,
+        max_length=10,
+        help_text="Japanese Title for card. Max length 10",
+    )
+    image = CustomImageChooserBlock(
+        required=True,
+        help_text="Image size: 2048px x 1280px (16/10 ratio). Please optimize image size before uploading.",
+    )
+    text = blocks.TextBlock(
+        required=True,
+        max_length=100,
+        help_text="Text for card. Max length 100",
+    )
+
+    class Meta:
+        icon = "table"
+        label = "Info Card Bilingual"
 
 
 class InfoCardSeriesBlock(blocks.StructBlock):

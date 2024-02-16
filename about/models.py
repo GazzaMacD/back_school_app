@@ -108,19 +108,19 @@ class AboutPage(HeadlessMixin, Page):
     )
 
     # History section
-    history_title = models.CharField(
-        "History Title",
+    history_en_title = models.CharField(
+        "History - English Title",
         blank=False,
         null=False,
-        max_length=15,
-        help_text="Required. Max length 15 characters.",
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
     )
-    history_tagline = models.CharField(
-        "History Tagline",
+    history_jp_title = models.CharField(
+        "History - Japanese Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters. Japanese",
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
     history_content = StreamField(
         [
@@ -166,8 +166,8 @@ class AboutPage(HeadlessMixin, Page):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("history_title"),
-                FieldPanel("history_tagline"),
+                FieldPanel("history_en_title"),
+                FieldPanel("history_jp_title"),
                 FieldPanel("history_content"),
             ],
             heading="History Section",
@@ -187,8 +187,8 @@ class AboutPage(HeadlessMixin, Page):
         APIField("values_jp_title"),
         APIField("values_intro"),
         APIField("values_list"),
-        APIField("history_title"),
-        APIField("history_tagline"),
+        APIField("history_en_title"),
+        APIField("history_jp_title"),
         APIField("history_content"),
     ]
 

@@ -5,6 +5,7 @@ from modelcluster.fields import ParentalKey
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.api import APIField
 from wagtail_headless_preview.models import HeadlessMixin
+from wagtail.fields import RichTextField
 from rest_framework.fields import Field
 
 from streams import customblocks
@@ -79,28 +80,31 @@ class AboutPage(HeadlessMixin, Page):
     )
 
     # Core values section
-    values_title = models.CharField(
-        "Core Values Title",
+    values_en_title = models.CharField(
+        "Values - English Title",
         blank=False,
         null=False,
-        max_length=15,
-        help_text="Required. Max length 15 characters.",
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
     )
-    values_tagline = models.CharField(
-        "Core Values Tagline",
+    values_jp_title = models.CharField(
+        "Values - Japanese Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters. Japanese",
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
-    values_content = StreamField(
+    values_intro = RichTextField(
+        features=["bold"],
+    )
+    values_list = StreamField(
         [
-            ("rich_text", customblocks.CustomRichTextBlock()),
-            ("value_cards", customblocks.InfoCardSeriesBlock()),
+            ("value_cards", customblocks.InfoCardBlockBilingual()),
         ],
         use_json_field=True,
         null=True,
         blank=False,
+        max_num=6,
     )
 
     # History section
@@ -153,9 +157,10 @@ class AboutPage(HeadlessMixin, Page):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("values_title"),
-                FieldPanel("values_tagline"),
-                FieldPanel("values_content"),
+                FieldPanel("values_en_title"),
+                FieldPanel("values_jp_title"),
+                FieldPanel("values_intro"),
+                FieldPanel("values_list"),
             ],
             heading="Core Values Section",
         ),
@@ -178,9 +183,10 @@ class AboutPage(HeadlessMixin, Page):
         APIField("staff_en_title"),
         APIField("staff_jp_title"),
         APIField("staff_members"),
-        APIField("values_title"),
-        APIField("values_tagline"),
-        APIField("values_content"),
+        APIField("values_en_title"),
+        APIField("values_jp_title"),
+        APIField("values_intro"),
+        APIField("values_list"),
         APIField("history_title"),
         APIField("history_tagline"),
         APIField("history_content"),

@@ -42,6 +42,7 @@ class ContactPage(HeadlessMixin, Page):
         help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
     trial_intro = RichTextField(
+        "Trial - Intro",
         features=["bold", "link"],
     )
     trial_steps = StreamField(
@@ -53,17 +54,34 @@ class ContactPage(HeadlessMixin, Page):
         blank=False,
     )
 
-    # Learning experience section
-    join_experience = StreamField(
+    # Learning xperiences section
+    exp_en_title = models.CharField(
+        "Learning Experiences - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    exp_jp_title = models.CharField(
+        "Learning Experiences - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
+    exp_intro = RichTextField(
+        "Learning Experiences - Intro",
+        features=["bold", "link"],
+    )
+    exp_steps = StreamField(
         [
-            ("rich_text", customblocks.CustomRichTextBlock()),
-            ("youtube", customblocks.YoutubeBlock()),
-            ("info_cards", customblocks.InfoCardSeriesBlock()),
+            ("info_cards", customblocks.InfoCardBlockOptionalPic()),
         ],
         use_json_field=True,
         null=True,
         blank=False,
     )
+
     question_and_answer = StreamField(
         [
             ("q_and_a", customblocks.QuestionAnswerSeriesBlock()),
@@ -91,7 +109,15 @@ class ContactPage(HeadlessMixin, Page):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("join_experience"),
+                FieldPanel("exp_en_title"),
+                FieldPanel("exp_jp_title"),
+                FieldPanel("exp_intro"),
+                FieldPanel("exp_steps"),
+            ],
+            heading="Learning experiences section",
+        ),
+        MultiFieldPanel(
+            [
                 FieldPanel("question_and_answer"),
             ],
             heading="Contact page info section",
@@ -105,7 +131,10 @@ class ContactPage(HeadlessMixin, Page):
         APIField("trial_jp_title"),
         APIField("trial_intro"),
         APIField("trial_steps"),
-        APIField("join_experience"),
+        APIField("exp_en_title"),
+        APIField("exp_jp_title"),
+        APIField("exp_intro"),
+        APIField("exp_steps"),
         APIField("question_and_answer"),
     ]
 

@@ -345,6 +345,29 @@ class InfoCardBlockBilingual(blocks.StructBlock):
         label = "Info Card Bilingual"
 
 
+class InfoCardBlockOptionalPic(blocks.StructBlock):
+    """A block for card with title, optional image and text"""
+
+    title = blocks.CharBlock(
+        required=True,
+        max_length=20,
+        help_text="Title for card. Max length 20",
+    )
+    image = CustomImageChooserBlock(
+        required=False,
+        help_text="Image size: 2048px x 1280px (16/10 ratio). Please optimize image size before uploading.",
+    )
+    text = blocks.TextBlock(
+        required=True,
+        max_length=100,
+        help_text="Text for card. Max length 100",
+    )
+
+    class Meta:
+        icon = "table"
+        label = "Info Card Optional Pic"
+
+
 class InfoCardSeriesBlock(blocks.StructBlock):
     """A block for a series of cards"""
 

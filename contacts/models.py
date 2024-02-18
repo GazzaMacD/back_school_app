@@ -7,6 +7,7 @@ from wagtail.models import Page
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.fields import StreamField
 from wagtail.api import APIField
+from wagtail.fields import RichTextField
 
 from core.models import TimeStampedModel
 from users.models import CustomUser
@@ -25,18 +26,34 @@ class ContactPage(HeadlessMixin, Page):
         max_length=15,
         help_text="Required. Max length 15 characters. Japanese",
     )
-
     # Trial lesson section
-    assessment_trial = StreamField(
+    trial_en_title = models.CharField(
+        "Trial - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    trial_jp_title = models.CharField(
+        "Trial - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
+    trial_intro = RichTextField(
+        features=["bold", "link"],
+    )
+    trial_steps = StreamField(
         [
-            ("rich_text", customblocks.CustomRichTextBlock()),
-            ("youtube", customblocks.YoutubeBlock()),
-            ("info_cards", customblocks.InfoCardSeriesBlock()),
+            ("info_cards", customblocks.InfoCardBlockOptionalPic()),
         ],
         use_json_field=True,
         null=True,
         blank=False,
     )
+
+    # Learning experience section
     join_experience = StreamField(
         [
             ("rich_text", customblocks.CustomRichTextBlock()),
@@ -61,11 +78,19 @@ class ContactPage(HeadlessMixin, Page):
             [
                 FieldPanel("display_title"),
             ],
-            heading="Header area",
+            heading="Header section",
         ),
         MultiFieldPanel(
             [
-                FieldPanel("assessment_trial"),
+                FieldPanel("trial_en_title"),
+                FieldPanel("trial_jp_title"),
+                FieldPanel("trial_intro"),
+                FieldPanel("trial_steps"),
+            ],
+            heading="Trial section",
+        ),
+        MultiFieldPanel(
+            [
                 FieldPanel("join_experience"),
                 FieldPanel("question_and_answer"),
             ],
@@ -76,7 +101,10 @@ class ContactPage(HeadlessMixin, Page):
     # Api configuration
     api_fields = [
         APIField("display_title"),
-        APIField("assessment_trial"),
+        APIField("trial_en_title"),
+        APIField("trial_jp_title"),
+        APIField("trial_intro"),
+        APIField("trial_steps"),
         APIField("join_experience"),
         APIField("question_and_answer"),
     ]

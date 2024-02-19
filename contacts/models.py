@@ -54,7 +54,7 @@ class ContactPage(HeadlessMixin, Page):
         blank=False,
     )
 
-    # Learning xperiences section
+    # Learning experiences section
     exp_en_title = models.CharField(
         "Learning Experiences - English Title",
         blank=False,
@@ -82,9 +82,24 @@ class ContactPage(HeadlessMixin, Page):
         blank=False,
     )
 
-    question_and_answer = StreamField(
+    # Q & A section
+    qa_en_title = models.CharField(
+        "Learning Experiences - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    qa_jp_title = models.CharField(
+        "Learning Experiences - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
+    qas = StreamField(
         [
-            ("q_and_a", customblocks.QuestionAnswerSeriesBlock()),
+            ("q_and_a", customblocks.QuestionAnswerBlock()),
         ],
         use_json_field=True,
         null=True,
@@ -118,9 +133,11 @@ class ContactPage(HeadlessMixin, Page):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("question_and_answer"),
+                FieldPanel("qa_en_title"),
+                FieldPanel("qa_jp_title"),
+                FieldPanel("qas"),
             ],
-            heading="Contact page info section",
+            heading="Q and A section",
         ),
     ]
 
@@ -135,7 +152,9 @@ class ContactPage(HeadlessMixin, Page):
         APIField("exp_jp_title"),
         APIField("exp_intro"),
         APIField("exp_steps"),
-        APIField("question_and_answer"),
+        APIField("qa_en_title"),
+        APIField("qa_jp_title"),
+        APIField("qas"),
     ]
 
     max_count = 1

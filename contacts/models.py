@@ -136,6 +136,22 @@ class ContactPage(HeadlessMixin, Page):
         help_text="Required. Hyphens and spaces ok for readability! Max length 20 characters, 15 or less is ideal",
     )
 
+    # Form section
+    form_en_title = models.CharField(
+        "Form - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    form_jp_title = models.CharField(
+        "Form - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
+
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
@@ -178,6 +194,13 @@ class ContactPage(HeadlessMixin, Page):
             ],
             heading="Telephone contact section",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("form_en_title"),
+                FieldPanel("form_jp_title"),
+            ],
+            heading="Form contact section",
+        ),
     ]
 
     # Api configuration
@@ -198,6 +221,8 @@ class ContactPage(HeadlessMixin, Page):
         APIField("tel_jp_title"),
         APIField("tel_number"),
         APIField("tel_display_number"),
+        APIField("form_en_title"),
+        APIField("form_jp_title"),
     ]
 
     max_count = 1

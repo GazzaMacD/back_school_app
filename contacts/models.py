@@ -84,14 +84,14 @@ class ContactPage(HeadlessMixin, Page):
 
     # Q & A section
     qa_en_title = models.CharField(
-        "Learning Experiences - English Title",
+        "Q & A - English Title",
         blank=False,
         null=False,
         max_length=25,
         help_text="Required. Max length 25, 15 or less is ideal",
     )
     qa_jp_title = models.CharField(
-        "Learning Experiences - Japanese Title",
+        "Q & A - Japanese Title",
         blank=False,
         null=False,
         max_length=20,
@@ -104,6 +104,36 @@ class ContactPage(HeadlessMixin, Page):
         use_json_field=True,
         null=True,
         blank=False,
+    )
+
+    # Telephone section
+    tel_en_title = models.CharField(
+        "Telephone - English Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    tel_jp_title = models.CharField(
+        "Telephone - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
+    tel_number = models.CharField(
+        "Telephone - Actual Number",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. No spaces! Max length 20 characters, 15 or less is ideal",
+    )
+    tel_display_number = models.CharField(
+        "Telephone - Display Number",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Hyphens and spaces ok for readability! Max length 20 characters, 15 or less is ideal",
     )
 
     content_panels = Page.content_panels + [
@@ -139,6 +169,15 @@ class ContactPage(HeadlessMixin, Page):
             ],
             heading="Q and A section",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("tel_en_title"),
+                FieldPanel("tel_jp_title"),
+                FieldPanel("tel_number"),
+                FieldPanel("tel_display_number"),
+            ],
+            heading="Telephone contact section",
+        ),
     ]
 
     # Api configuration
@@ -155,6 +194,10 @@ class ContactPage(HeadlessMixin, Page):
         APIField("qa_en_title"),
         APIField("qa_jp_title"),
         APIField("qas"),
+        APIField("tel_en_title"),
+        APIField("tel_jp_title"),
+        APIField("tel_number"),
+        APIField("tel_display_number"),
     ]
 
     max_count = 1

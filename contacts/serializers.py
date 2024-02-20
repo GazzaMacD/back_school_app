@@ -13,13 +13,16 @@ class ContactUserSerializer(serializers.ModelSerializer):
 
 
 class ContactFormEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True, allow_blank=False, max_length=200)
-
-
-class ContactFormContactEmailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ContactEmail
-        fields = ("email",)
+    email = serializers.EmailField(
+        required=True,
+        allow_blank=False,
+        max_length=200,
+        error_messages={
+            "invalid": "有効なEメールアドレスを入力してください",
+            "blank": "Eメールアドレスを入力してください",
+            "required": "Eメールアドレスを入力してください",
+        },
+    )
 
 
 class ContactFormNoteSerializer(serializers.ModelSerializer):
@@ -29,7 +32,9 @@ class ContactFormNoteSerializer(serializers.ModelSerializer):
 
 
 class ContactFormSerializer(serializers.ModelSerializer):
-    contact_emails = ContactFormContactEmailSerializer(many=True)
+    contact_emails = ContactFormEmailSerializer(
+        many=True,
+    )
     contact_notes = ContactFormNoteSerializer(many=True)
 
     class Meta:

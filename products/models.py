@@ -392,29 +392,49 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         "Display Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters, 45 or less is ideal",
-    )
-    display_tagline = models.CharField(
-        "Disply Tagline",
-        blank=False,
-        null=False,
-        max_length=160,
-        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the experiences",
+        max_length=15,
+        help_text="Required. Max length 15 characters. Japanese",
     )
     intro = RichTextField(
-        "Introduction",
+        "LE - Intro",
         blank=False,
         null=False,
         features=[
-            "h3",
-            "h4",
             "bold",
-            "italic",
-            "ol",
-            "ul",
+            "link",
         ],
         help_text="Required. For the concepts surrounding learning experiences",
+    )
+    # Upcoming experiences
+    upcoming_en_title = models.CharField(
+        "LE - Upcoming English title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    upcoming_jp_title = models.CharField(
+        "Mission - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
+
+    # Experiences gallery
+    gallery_en_title = models.CharField(
+        "LE - Gallery English title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    gallery_jp_title = models.CharField(
+        "LE - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
     experiences_gallery = StreamField(
         [
@@ -433,18 +453,34 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
-                FieldPanel("display_tagline"),
                 FieldPanel("intro"),
             ],
             heading="Learning Experience header section",
         ),
-        FieldPanel("experiences_gallery"),
+        MultiFieldPanel(
+            [
+                FieldPanel("upcoming_en_title"),
+                FieldPanel("upcoming_jp_title"),
+            ],
+            heading="Learning Experience upcoming section",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("gallery_en_title"),
+                FieldPanel("gallery_jp_title"),
+                FieldPanel("experiences_gallery"),
+            ],
+            heading="Learning Experience gallery section",
+        ),
     ]
 
     api_fields = [
         APIField("display_title"),
-        APIField("display_tagline"),
         APIField("intro"),
+        APIField("upcoming_en_title"),
+        APIField("upcoming_jp_title"),
+        APIField("gallery_en_title"),
+        APIField("gallery_jp_title"),
         APIField("experiences_gallery"),
     ]
 

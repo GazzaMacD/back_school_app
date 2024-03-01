@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from dotenv import load_dotenv
 import os
@@ -77,6 +76,7 @@ INSTALLED_APPS = [
     "lessons",
     "products",
     "schedules",
+    "singles",
     "streams",
     "staff",
     "taxes",

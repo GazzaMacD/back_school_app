@@ -116,22 +116,22 @@ class LanguageSchoolListPage(HeadlessMixin, Page):
         return self.title
 
 
-class LanguageSchoolDetailPage(Page):
+class LanguageSchoolDetailPage(HeadlessMixin, Page):
     """Detail display page for the language school"""
 
     display_title = models.CharField(
         "Display Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters, 45 or less is ideal",
+        max_length=15,
+        help_text="Required. Max length 15 characters. Japanese",
     )
     ls = models.ForeignKey(
         "languageschools.LanguageSchool",
         on_delete=models.PROTECT,
         blank=False,
         null=False,
-        help_text="The associated language school. Title of this page should match the name of this associated language school. If it doesn't the title will be updated to match on save.",
+        help_text="The associated language school. Title of this page should match the name of this associated language school. If it doesn't the title and slug will be updated to match on save.",
     )
     header_image = models.ForeignKey(
         "wagtailimages.Image",
@@ -153,13 +153,19 @@ class LanguageSchoolDetailPage(Page):
             "ol",
             "ul",
         ],
-        help_text="Required.",
+        help_text="Required. Introduction to the school",
     )
     display_map = models.TextField(
         "Display map",
         null=False,
         blank=False,
         help_text='Required. Please paste the iframe imbed code here. Please remove both the height="....." and width="....." attributes from the code before saving otherwise the map will not display as intended on the site',
+    )
+    display_city = models.CharField(
+        "Readonly Display City",
+        null=False,
+        blank=True,
+        help_text="Readonly Field, auto updated from school address. If address is changed in admin please save this again to update this field",
     )
     access_info = models.TextField(
         "Access Information",
@@ -189,20 +195,21 @@ class LanguageSchoolDetailPage(Page):
                 FieldPanel("header_image"),
                 FieldPanel("display_intro"),
             ],
-            heading="Language School header section",
+            heading="Header Section",
         ),
         MultiFieldPanel(
             [
                 FieldPanel("display_map"),
+                FieldPanel("display_city", read_only=True),
                 FieldPanel("access_info"),
             ],
-            heading="Language School Location and Access",
+            heading="Location and Access",
         ),
         MultiFieldPanel(
             [
                 FieldPanel("ls_photos"),
             ],
-            heading="Language School Photos",
+            heading="School Photos",
         ),
     ]
     # Api configuration
@@ -212,6 +219,7 @@ class LanguageSchoolDetailPage(Page):
         APIField("header_image", serializer=HeaderImageFieldSerializer()),
         APIField("display_intro"),
         APIField("display_map"),
+        APIField("display_city"),
         APIField("access_info"),
         APIField("ls_photos"),
     ]
@@ -224,13 +232,15 @@ class LanguageSchoolDetailPage(Page):
     def __str__(self):
         return self.title
 
-    def full_clean(self, *args, **kwargs):
-        """Use full clean to manipulate title and slug so as to be consistent
-        with the base language school django model"""
-        super().full_clean(*args, **kwargs)
-
+    def clean(self):
+        """Custom clean to manipulate title and slug so as to be consistent
+        with the base language school django model. Also to update the display_city
+         field to be consistend with school address. To save queries on list views"""
         if not self.title == self.ls.name:
             self.title = self.ls.name
 
         if not self.slug == self.ls.slug:
             self.slug = self.ls.slug
+
+        if not self.display_city == self.ls.address.city_town_village:
+            self.display_city = self.ls.address.city_town_village

@@ -4,9 +4,10 @@ from wagtail.models import Page
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.fields import RichTextField, StreamField
 from wagtail.api import APIField
+from wagtail_headless_preview.models import HeadlessMixin
 from rest_framework.fields import Field
-from streams import customblocks
 
+from streams import customblocks
 from core.models import (
     TimeStampedModel,
 )
@@ -62,15 +63,16 @@ class LanguageSchool(TimeStampedModel):
         return self.name
 
 
-class LanguageSchoolListPage(Page):
+class LanguageSchoolListPage(HeadlessMixin, Page):
     """Display list page for all language schools"""
 
+    # Fields
     display_title = models.CharField(
         "Display Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters, 45 or less is ideal",
+        max_length=15,
+        help_text="Required. Max length 15 characters. Japanese",
     )
     display_intro = RichTextField(
         "Display Introduction",
@@ -94,7 +96,7 @@ class LanguageSchoolListPage(Page):
                 FieldPanel("display_title"),
                 FieldPanel("display_intro"),
             ],
-            heading="Language School List Page header section",
+            heading="Header Section",
         ),
     ]
 

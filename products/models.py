@@ -395,15 +395,30 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         max_length=15,
         help_text="Required. Max length 15 characters. Japanese",
     )
+    # Intro experiences
+    intro_en_title = models.CharField(
+        "Intro - English Title",
+        blank=False,
+        null=False,
+        max_length=35,
+        help_text="Required. Max length 35",
+    )
+    intro_jp_title = models.CharField(
+        "Intro - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
     intro = RichTextField(
-        "LE - Intro",
+        "Intro - detail",
         blank=False,
         null=False,
         features=[
             "bold",
             "link",
         ],
-        help_text="Required. For the concepts surrounding learning experiences",
+        help_text="Required. Explain the concepts surrounding learning experiences",
     )
     # Upcoming experiences
     upcoming_en_title = models.CharField(
@@ -453,16 +468,18 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
+                FieldPanel("intro_en_title"),
+                FieldPanel("intro_jp_title"),
                 FieldPanel("intro"),
             ],
-            heading="Learning Experience header section",
+            heading="Header and Intro",
         ),
         MultiFieldPanel(
             [
                 FieldPanel("upcoming_en_title"),
                 FieldPanel("upcoming_jp_title"),
             ],
-            heading="Learning Experience upcoming section",
+            heading="Upcoming Experiences",
         ),
         MultiFieldPanel(
             [
@@ -470,12 +487,14 @@ class LearningExperienceListPage(HeadlessMixin, Page):
                 FieldPanel("gallery_jp_title"),
                 FieldPanel("experiences_gallery"),
             ],
-            heading="Learning Experience gallery section",
+            heading="Past Experiences Gallery",
         ),
     ]
 
     api_fields = [
         APIField("display_title"),
+        APIField("intro_en_title"),
+        APIField("intro_jp_title"),
         APIField("intro"),
         APIField("upcoming_en_title"),
         APIField("upcoming_jp_title"),

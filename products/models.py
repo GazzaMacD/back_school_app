@@ -563,10 +563,9 @@ class StaffMembersFieldSerializer(Field):
         image = value.profile_image
         return {
             "id": value.id,
-            "name": value.title,
+            "name": value.display_name,
+            "tagline": value.display_tagline,
             "slug": value.slug,
-            "position": value.role,
-            "intro": value.intro,
             "image": {
                 "id": image.id,
                 "title": image.title,

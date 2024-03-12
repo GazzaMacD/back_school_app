@@ -126,6 +126,13 @@ class LanguageSchoolDetailPage(HeadlessMixin, Page):
         max_length=15,
         help_text="Required. Max length 15 characters. Japanese",
     )
+    display_tagline = models.CharField(
+        "Display tagline",
+        blank=False,
+        null=False,
+        max_length=50,
+        help_text="Required. Max 50. Attractive, short summary of school",
+    )
     ls = models.ForeignKey(
         "languageschools.LanguageSchool",
         on_delete=models.PROTECT,
@@ -191,6 +198,7 @@ class LanguageSchoolDetailPage(HeadlessMixin, Page):
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
+                FieldPanel("display_tagline"),
                 FieldPanel("ls"),
                 FieldPanel("header_image"),
                 FieldPanel("display_intro"),
@@ -215,6 +223,7 @@ class LanguageSchoolDetailPage(HeadlessMixin, Page):
     # Api configuration
     api_fields = [
         APIField("display_title"),
+        APIField("display_tagline"),
         APIField("ls", serializer=LSSerializer()),
         APIField("header_image", serializer=HeaderImageFieldSerializer()),
         APIField("display_intro"),

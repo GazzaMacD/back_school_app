@@ -174,11 +174,19 @@ class LanguageSchoolDetailPage(HeadlessMixin, Page):
         blank=True,
         help_text="Readonly Field, auto updated from school address. If address is changed in admin please save this again to update this field",
     )
-    access_info = models.TextField(
-        "Access Information",
+    access_train = models.CharField(
+        "Access - Train",
         null=False,
         blank=False,
-        help_text="Please explain all modes of access relevent to this language school",
+        max_length=35,
+        help_text="Required. Max 35char. Please explain in Japanese train access",
+    )
+    access_car = models.CharField(
+        "Access - Car",
+        null=False,
+        blank=False,
+        max_length=35,
+        help_text="Required. Max 35char. Please explain in Japanese car access and whether parking is available or not",
     )
     ls_photos = StreamField(
         [
@@ -209,9 +217,10 @@ class LanguageSchoolDetailPage(HeadlessMixin, Page):
             [
                 FieldPanel("display_map"),
                 FieldPanel("display_city", read_only=True),
-                FieldPanel("access_info"),
+                FieldPanel("access_train"),
+                FieldPanel("access_car"),
             ],
-            heading="Location and Access",
+            heading="Access",
         ),
         MultiFieldPanel(
             [
@@ -229,7 +238,8 @@ class LanguageSchoolDetailPage(HeadlessMixin, Page):
         APIField("display_intro"),
         APIField("display_map"),
         APIField("display_city"),
-        APIField("access_info"),
+        APIField("access_train"),
+        APIField("access_car"),
         APIField("ls_photos"),
     ]
 

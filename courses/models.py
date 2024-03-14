@@ -178,6 +178,7 @@ class CourseDisplayListPage(Page):
             [
                 FieldPanel("en_sec_title"),
                 FieldPanel("en_sec_dis_title"),
+                FieldPanel("en_sec_dis_tagline"),
                 FieldPanel("en_sec_pop_title"),
                 InlinePanel(
                     "pop_en_courses",

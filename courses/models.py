@@ -7,6 +7,7 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.api import APIField
 from wagtail.snippets.models import register_snippet
 from rest_framework.fields import Field
+from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.fields import StreamField
 
 from core.models import (
@@ -112,7 +113,7 @@ class Course(TimeStampedModel):
         return self.title_en
 
 
-class CourseDisplayListPage(Page):
+class CourseDisplayListPage(HeadlessMixin, Page):
     """Page model to for the editable content above the language courses listings"""
 
     display_title = models.CharField(
@@ -122,6 +123,21 @@ class CourseDisplayListPage(Page):
         max_length=15,
         help_text="Required. Max length 15 characters. Japanese",
     )
+    # Popular Courses section
+    popular_en_title = models.CharField(
+        "Popular - Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    popular_jp_title = models.CharField(
+        "Popular - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
     # Admin panel configuration
     content_panels = Page.content_panels + [
         MultiFieldPanel(
@@ -130,11 +146,22 @@ class CourseDisplayListPage(Page):
             ],
             heading="Courses header section",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("popular_en_title"),
+                FieldPanel("popular_jp_title"),
+                InlinePanel("popular_courses", label="Course", max_num=4),
+            ],
+            heading="Popular Courses section",
+        ),
     ]
 
     # Api configuration
     api_fields = [
         APIField("display_title"),
+        APIField("popular_en_title"),
+        APIField("popular_jp_title"),
+        APIField("popular_courses"),
     ]
 
     # Page limitations, Meta and methods
@@ -310,12 +337,10 @@ class PopularEnglishCourse(Orderable):
     page = ParentalKey(
         CourseDisplayListPage,
         on_delete=models.CASCADE,
-        related_name="pop_en_courses",
+        related_name="popular_courses",
     )
     course = models.ForeignKey(
-        "courses.CourseDisplayDetailPage",
-        on_delete=models.CASCADE,
-        limit_choices_to={"subject_slug": "english"},
+        "courses.CourseDisplayDetailPage", on_delete=models.CASCADE
     )
 
     panels = [

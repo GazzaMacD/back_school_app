@@ -100,5 +100,5 @@ class CourseCategoryChoices(models.TextChoices):
 
     GENERAL = "general", "General,日常"
     BUSINESS = "business", "Business,ビジネス"
-    TEST_PREPARATION = "test-preparation", "Test Preparation,テスト対策"
+    TEST_PREPARATION = "testpreparation", "Test Preparation,テスト対策"
     WRITING = "writing", "Writing,ライティング"

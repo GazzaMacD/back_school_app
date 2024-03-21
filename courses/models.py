@@ -138,6 +138,21 @@ class CourseDisplayListPage(HeadlessMixin, Page):
         max_length=20,
         help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
+    # Popular Courses section
+    english_en_title = models.CharField(
+        "English - Title",
+        blank=False,
+        null=False,
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
+    )
+    english_jp_title = models.CharField(
+        "English - Japanese Title",
+        blank=False,
+        null=False,
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
+    )
     # Admin panel configuration
     content_panels = Page.content_panels + [
         MultiFieldPanel(
@@ -154,6 +169,13 @@ class CourseDisplayListPage(HeadlessMixin, Page):
             ],
             heading="Popular Courses section",
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("english_en_title"),
+                FieldPanel("english_jp_title"),
+            ],
+            heading="English Courses section",
+        ),
     ]
 
     # Api configuration
@@ -162,6 +184,8 @@ class CourseDisplayListPage(HeadlessMixin, Page):
         APIField("popular_en_title"),
         APIField("popular_jp_title"),
         APIField("popular_courses"),
+        APIField("english_en_title"),
+        APIField("english_jp_title"),
     ]
 
     # Page limitations, Meta and methods

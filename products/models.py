@@ -893,6 +893,12 @@ class ClassPricesListPage(HeadlessMixin, Page):
                 FieldPanel("regular_en_title"),
                 FieldPanel("regular_jp_title"),
                 FieldPanel("regular_intro"),
+                InlinePanel(
+                    "regular_price_plans",
+                    label="Regular Price Plans",
+                    max_num=8,
+                    help_text="Max 8 prices for this section",
+                ),
             ],
             heading="Regular Plans section",
         ),
@@ -907,6 +913,7 @@ class ClassPricesListPage(HeadlessMixin, Page):
         APIField("regular_en_title"),
         APIField("regular_jp_title"),
         APIField("regular_intro"),
+        APIField("regular_price_plans"),
     ]
 
     # Page limitations, Meta and methods
@@ -1000,12 +1007,15 @@ class ListPagePricePlanSerializer(Field):
                 "pretax_price": str(p.price),
                 "posttax_price": self.calculate_taxed_amount(p.price, tax_rate),
                 "is_sale": p.is_limited_sale,
-                "start_date": p.start_date,
-                "is_limited_sale": p.is_limited_sale,
-                "before_sale_pretax_price": str(p.before_sale_price),
+                "before_sale_pretax_price": (
+                    str(p.before_sale_price)
+                    if p.before_sale_price
+                    else p.before_sale_price
+                ),
                 "before_sale_posttax_price": self.calculate_taxed_amount(
                     p.before_sale_price, tax_rate
                 ),
+                "start_date": p.start_date,
                 "end_date": p.end_date,
             }
         return {}
@@ -1043,6 +1053,32 @@ class PrivatePricePlans(Orderable):
         "products.ClassPricesDetailPage",
         on_delete=models.CASCADE,
         limit_choices_to={"class_service__class_type": "private"},
+    )
+
+    panels = [
+        FieldPanel("price_plan"),
+    ]
+
+    api_fields = [
+        APIField("price_plan", serializer=ListPagePricePlanSerializer()),
+    ]
+
+    def __str__(self):
+        return self.price_plan.title
+
+
+class RegularPricePlans(Orderable):
+    """Orderable field for regular clases on price plan list page"""
+
+    page = ParentalKey(
+        ClassPricesListPage,
+        on_delete=models.CASCADE,
+        related_name="regular_price_plans",
+    )
+    price_plan = models.ForeignKey(
+        "products.ClassPricesDetailPage",
+        on_delete=models.CASCADE,
+        limit_choices_to={"class_service__class_type": "regular"},
     )
 
     panels = [

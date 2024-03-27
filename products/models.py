@@ -810,126 +810,110 @@ class ExperienceRelatedLessons(Orderable):
 
 class ClassPricesListPage(HeadlessMixin, Page):
     display_title = models.CharField(
-        "Display Title",
+        "Price Plans display title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters, 45 or less is ideal",
+        max_length=15,
+        help_text="Required. Max length 15 characters, Japanese",
     )
-    display_tagline = models.CharField(
-        "Disply Tagline",
+    # Private price plans section
+    private_en_title = models.CharField(
+        "Private Plans - English Title",
         blank=False,
         null=False,
-        max_length=160,
-        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the classes",
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
     )
-    intro = RichTextField(
-        "Introduction",
+    private_jp_title = models.CharField(
+        "Private Plans - Japanese Title",
         blank=False,
         null=False,
-        features=[
-            "h3",
-            "h4",
-            "bold",
-            "italic",
-            "ol",
-            "ul",
-        ],
-        help_text="Required. For the concepts surrounding Xlingual classes",
-    )
-    private_title = models.CharField(
-        "Private Classes Title",
-        blank=False,
-        null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters, 45 or less is ideal",
-    )
-    private_tagline = models.CharField(
-        "Private Classes Tagline",
-        blank=False,
-        null=False,
-        max_length=160,
-        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the classes",
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
     private_intro = RichTextField(
-        "Private Classes Introduction",
+        "Private Plans - Intro",
         blank=False,
         null=False,
         features=[
-            "h3",
-            "h4",
             "bold",
             "italic",
-            "ol",
-            "ul",
         ],
-        help_text="Required. For the concepts surrounding Xlingual private classes. Not too long please",
+        help_text="Required. Introduce the benifits of Xlingual private plans",
     )
-    regular_title = models.CharField(
-        "Regular Classes Title",
+    # Regular price plans section
+    regular_en_title = models.CharField(
+        "Regular Plans - English Title",
         blank=False,
         null=False,
-        max_length=100,
-        help_text="Required. Max length 100 characters, 45 or less is ideal",
+        max_length=25,
+        help_text="Required. Max length 25, 15 or less is ideal",
     )
-    regular_tagline = models.CharField(
-        "Regular Classes Tagline",
+    regular_jp_title = models.CharField(
+        "Regular Plans - Japanese Title",
         blank=False,
         null=False,
-        max_length=160,
-        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the classes",
+        max_length=20,
+        help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
     regular_intro = RichTextField(
-        "Regular Classes Introduction",
+        "Regular Plans - Intro",
         blank=False,
         null=False,
         features=[
-            "h3",
-            "h4",
             "bold",
             "italic",
-            "ol",
-            "ul",
         ],
-        help_text="Required. For the concepts surrounding Xlingual private classes. Not too long please",
+        help_text="Required. Introduce the benifits of Xlingual private plans",
     )
+
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
-                FieldPanel("display_tagline"),
-                FieldPanel("intro"),
             ],
-            heading="Class Prices header section",
+            heading="Price Plans Header Section",
         ),
         MultiFieldPanel(
             [
-                FieldPanel("private_title"),
-                FieldPanel("private_tagline"),
+                FieldPanel("private_en_title"),
+                FieldPanel("private_jp_title"),
                 FieldPanel("private_intro"),
+                InlinePanel(
+                    "private_price_plans",
+                    label="Private Price Plans",
+                    max_num=8,
+                    help_text="Max 8 prices for this section",
+                ),
             ],
-            heading="Private Classes section",
+            heading="Private Plans section",
         ),
         MultiFieldPanel(
             [
-                FieldPanel("regular_title"),
-                FieldPanel("regular_tagline"),
+                FieldPanel("regular_en_title"),
+                FieldPanel("regular_jp_title"),
                 FieldPanel("regular_intro"),
+                InlinePanel(
+                    "regular_price_plans",
+                    label="Regular Price Plans",
+                    max_num=8,
+                    help_text="Max 8 prices for this section",
+                ),
             ],
-            heading="Regular Classes section",
+            heading="Regular Plans section",
         ),
     ]
 
     api_fields = [
         APIField("display_title"),
-        APIField("display_tagline"),
-        APIField("intro"),
-        APIField("private_title"),
-        APIField("private_tagline"),
+        APIField("private_en_title"),
+        APIField("private_jp_title"),
         APIField("private_intro"),
-        APIField("regular_title"),
-        APIField("regular_tagline"),
+        APIField("private_price_plans"),
+        APIField("regular_en_title"),
+        APIField("regular_jp_title"),
         APIField("regular_intro"),
+        APIField("regular_price_plans"),
     ]
 
     # Page limitations, Meta and methods
@@ -996,6 +980,122 @@ class ClassServiceFieldSerializer(Field):
             "bookable_online": value.bookable_online,
             "price_info": self.get_price(value.prices.all(), value.tax_rate.rate),
         }
+
+
+# Orderables for List page and serializers
+class ListPagePricePlanSerializer(Field):
+    def calculate_taxed_amount(self, price, tax_rate):
+        if not isinstance(price, Decimal) or not isinstance(tax_rate, Decimal):
+            return None
+        return str(round(price + (price * (tax_rate / Decimal("100.00")))))
+
+    def get_price(self, prices, tax_rate):
+        filtered_prices = []
+        now = int(timezone.now().timestamp())
+        for price in prices:
+            if now < int(price.start_date.timestamp()):
+                continue
+            if price.end_date and now > int(price.end_date.timestamp()):
+                continue
+            filtered_prices.append(price)
+        filtered_prices.sort(reverse=True, key=lambda x: x.start_date)
+        if len(filtered_prices) > 0:
+            p = filtered_prices[0]
+            return {
+                "name": p.name,
+                "display_name": p.display_name,
+                "pretax_price": str(p.price),
+                "posttax_price": self.calculate_taxed_amount(p.price, tax_rate),
+                "is_sale": p.is_limited_sale,
+                "before_sale_pretax_price": (
+                    str(p.before_sale_price)
+                    if p.before_sale_price
+                    else p.before_sale_price
+                ),
+                "before_sale_posttax_price": self.calculate_taxed_amount(
+                    p.before_sale_price, tax_rate
+                ),
+                "start_date": p.start_date,
+                "end_date": p.end_date,
+            }
+        return {}
+
+    def to_representation(self, value):
+        cs = value.class_service
+        return {
+            "id": value.id,
+            "slug": value.slug,
+            "title": value.title,
+            "display_title": value.display_title,
+            "length": cs.length,
+            "length_unit": cs.get_length_unit_display(),
+            "quantity": cs.quantity,
+            "quantity_unit": cs.get_quantity_unit_display(),
+            "max_num": cs.max_num,
+            "is_native": cs.is_native,
+            "is_online": cs.is_online,
+            "is_inperson": cs.is_inperson,
+            "has_onlinenotes": cs.has_onlinenotes,
+            "bookable_online": cs.bookable_online,
+            "price_info": self.get_price(cs.prices.all(), cs.tax_rate.rate),
+        }
+
+
+class PrivatePricePlans(Orderable):
+    """Orderable field for private clases on price plan list page"""
+
+    page = ParentalKey(
+        ClassPricesListPage,
+        on_delete=models.CASCADE,
+        related_name="private_price_plans",
+    )
+    price_plan = models.ForeignKey(
+        "products.ClassPricesDetailPage",
+        on_delete=models.CASCADE,
+        limit_choices_to={"class_service__class_type": "private"},
+    )
+
+    panels = [
+        FieldPanel("price_plan"),
+    ]
+
+    api_fields = [
+        APIField("price_plan", serializer=ListPagePricePlanSerializer()),
+    ]
+
+    def __str__(self):
+        return self.price_plan.title
+
+
+class RegularPricePlans(Orderable):
+    """Orderable field for regular clases on price plan list page"""
+
+    page = ParentalKey(
+        ClassPricesListPage,
+        on_delete=models.CASCADE,
+        related_name="regular_price_plans",
+    )
+    price_plan = models.ForeignKey(
+        "products.ClassPricesDetailPage",
+        on_delete=models.CASCADE,
+        limit_choices_to={"class_service__class_type": "regular"},
+    )
+
+    panels = [
+        FieldPanel("price_plan"),
+    ]
+
+    api_fields = [
+        APIField("price_plan", serializer=ListPagePricePlanSerializer()),
+    ]
+
+    def __str__(self):
+        return self.price_plan.title
+
+
+#
+# Class Price Detail Page
+#
 
 
 class ClassPricesDetailPage(HeadlessMixin, Page):

@@ -9,6 +9,7 @@ from wagtail.snippets.models import register_snippet
 from rest_framework.fields import Field
 from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.fields import StreamField
+from products.serializers import ClassPricePlanSerializer
 
 from core.models import (
     TimeStampedModel,
@@ -305,6 +306,12 @@ class CourseDisplayDetailPage(Page):
         ),
         MultiFieldPanel(
             [
+                InlinePanel("common_price_plans", label="Class Price Plan", max_num=3),
+            ],
+            heading="Common Associated Prices Plans",
+        ),
+        MultiFieldPanel(
+            [
                 InlinePanel("related_courses", label="Course", max_num=4),
             ],
             heading="Related Courses",
@@ -322,6 +329,7 @@ class CourseDisplayDetailPage(Page):
         APIField("level_to", serializer=LevelFieldsSerializer()),
         APIField("course_content_points"),
         APIField("course_description"),
+        APIField("common_price_plans"),
         APIField("related_courses"),
     ]
 
@@ -400,3 +408,28 @@ class RelatedCourse(Orderable):
 
     def __str__(self):
         return self.course.title
+
+
+class CommonPricePlans(Orderable):
+    """Orderable field for commonly associated price plans"""
+
+    page = ParentalKey(
+        CourseDisplayDetailPage,
+        on_delete=models.CASCADE,
+        related_name="common_price_plans",
+    )
+    price_plan = models.ForeignKey(
+        "products.ClassPricesDetailPage",
+        on_delete=models.CASCADE,
+    )
+
+    panels = [
+        FieldPanel("price_plan"),
+    ]
+
+    api_fields = [
+        APIField("price_plan", serializer=ClassPricePlanSerializer()),
+    ]
+
+    def __str__(self):
+        return self.price_plan.title

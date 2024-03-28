@@ -1132,7 +1132,6 @@ class ClassPricesDetailPage(HeadlessMixin, Page):
     class_intro = StreamField(
         [
             ("rich_text", customblocks.CustomRichTextBlock()),
-            ("beyond_text_img", customblocks.StandardCustomImageBlock()),
             ("text_width_img", customblocks.StandardCustomImageBlock()),
             ("youtube", customblocks.YoutubeBlock()),
         ],

@@ -266,6 +266,8 @@ class CourseDisplayDetailPage(Page):
         use_json_field=True,
         null=True,
         blank=False,
+        min_num=6,
+        max_num=10,
     )
     course_description = StreamField(
         [

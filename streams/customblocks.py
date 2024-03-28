@@ -10,8 +10,8 @@ class ShortCharBlock(blocks.StructBlock):
 
     text = blocks.CharBlock(
         required=True,
-        max_length=20,
-        help_text="Required. Max length 20 chars",
+        max_length=35,
+        help_text="Required. Max length 35 chars",
     )
 
     class Meta:

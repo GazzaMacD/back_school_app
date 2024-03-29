@@ -77,28 +77,19 @@ class LessonListPage(HeadlessMixin, Page):
         max_length=100,
         help_text="Required. Max length 15 characters.",
     )
-    display_tagline = models.CharField(
-        "Display Tagline",
-        blank=False,
-        null=False,
-        max_length=160,
-        help_text="Required. Max length 160 char. A catchy, attractive tagline to give more information and sell the blog lessons",
-    )
     # Admin panel configuration
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
                 FieldPanel("display_title"),
-                FieldPanel("display_tagline"),
             ],
-            heading="Blog Lessons list page header area",
+            heading="Header area",
         )
     ]
 
     # Api configuration
     api_fields = [
         APIField("display_title"),
-        APIField("display_tagline"),
     ]
 
     # Page limitations, Meta and methods

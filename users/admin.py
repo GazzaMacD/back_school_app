@@ -11,20 +11,17 @@ class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = (
         "email",
-        "full_name",
-        "full_en_name",
         "is_staff",
         "is_active",
     )
     list_filter = (
         "email",
-        "full_name",
         "is_staff",
         "is_active",
     )
     # The fields that are available in the change user form in admin
     fieldsets = (
-        (None, {"fields": ("email", "full_name", "full_en_name", "password")}),
+        (None, {"fields": ("email", "password")}),
         (
             "Permissions",
             {"fields": ("is_staff", "is_active", "groups", "user_permissions")},

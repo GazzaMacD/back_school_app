@@ -1,0 +1,19 @@
+{% extends "account/email/base_message.txt" %}
+{% load account %}
+{% load i18n %}
+
+{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}
+このEメールは、ユーザー {{ user_display }}が、こちらのサイト {{ site_domain }} へのアカウント登録のためにあなたのEメールアドレスを提供されたため、送信されています。
+お間違えなければ、以下のリンク内の手順でアカウント登録を完了してください。
+{{ activate_url }}　
+もしこちらのメールについてお心当たりのない場合はこのメールについて無視していただいてかまいません。
+----
+You're receiving this e-mail because user {{ user_display }} has given your e-mail address to register an account on {{ site_domain }}.
+
+To confirm this is correct, go to {{ activate_url }}
+
+If you did not sign up for an account, please ignore this email.
+----
+{% endblocktrans %}{% endautoescape %}{% endblock %}
+
+

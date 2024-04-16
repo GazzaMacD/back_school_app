@@ -11,26 +11,13 @@ from .managers import CustomUserManager
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     """Custom user model with email instead of username along with
     other fields for names"""
+
     email = models.EmailField(
         _("email address"),
         unique=True,
         blank=False,
         null=False,
         help_text="*Required. Email must be unique for each user",
-    )
-    full_name = models.CharField(
-        _("name"),
-        blank=True,
-        null=False,
-        max_length=45,
-        help_text="*Required. Full name in the name order user would like in public and in app.  Any character set is ok, 日本語 for example.",
-    )
-    full_en_name = models.CharField(
-        _("english name"),
-        blank=True,
-        null=False,
-        max_length=45,
-        help_text="Full name in English, used for internal use. Not required but useful",
     )
     is_staff = models.BooleanField(
         _("is staff"),
@@ -70,4 +57,4 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def __str__(self):
-        return f"User: {self.full_name} Email:{self.email}"
+        return f"Email:{self.email}"

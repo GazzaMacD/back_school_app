@@ -3,8 +3,10 @@
 /static/
 *.sqlite3
 dev.py
+staging.py
 production.py
 .env
+.project_files
 
 # Python and others
 __pycache__

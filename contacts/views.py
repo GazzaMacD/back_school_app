@@ -16,10 +16,8 @@ class ContactFormView(APIView):
     """
     Write or Update view for contact form
 
-    NOTE: Need IP Address permission class here
+    NOTE: Permission checking domain name required here.
     """
-
-    permission_classes = [SafeIPsPermission]
 
     def send_notification_email(self, email, validated_data):
         note = validated_data.get("contact_notes")[0].get("note")

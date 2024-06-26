@@ -140,8 +140,8 @@ class LessonDetailPage(HeadlessMixin, Page):
         "Display Tagline",
         blank=False,
         null=False,
-        max_length=50,
-        help_text="A catchy, short introduction of what the blog lesson is about. Max length 50 chars",
+        max_length=200,
+        help_text="A catchy, short introduction of what the blog lesson is about. Max length 200 chars",
     )
     published_date = models.DateTimeField(
         blank=False,

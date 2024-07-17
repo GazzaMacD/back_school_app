@@ -40,6 +40,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
 
     class Meta(UserDetailsSerializer.Meta):
         fields = (
+            "id",
             "email",
             "contact",
             "is_staff",

@@ -3,6 +3,12 @@ from rest_framework import serializers
 from .models import Contact, ContactEmail, Note
 
 
+class GetUpdateContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = ("name", "name_en")
+
+
 class ContactUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact

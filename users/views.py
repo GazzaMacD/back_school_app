@@ -34,11 +34,15 @@ class GetUpdateContactView(APIView):
 
     def put(self, request, pk, format=None):
         contact = self.get_object(pk)
-        data = request.data
-        data["name"] = html.escape(data["name"])
-        data["name_en"] = html.escape(data["name_en"])
-        serializer = GetUpdateContactSerializer(contact, data=data)
+        serializer = GetUpdateContactSerializer(contact, data=request.data)
         if serializer.is_valid():
+            # Sanitize string
+            serializer.validated_data.update(
+                {
+                    "name": html.escape(serializer.validated_data.get("name")),
+                    "name_en": html.escape(serializer.validated_data.get("name_en")),
+                }
+            )
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

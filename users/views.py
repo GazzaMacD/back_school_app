@@ -8,10 +8,30 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 
 from contacts.serializers import GetUpdateContactSerializer
+from users.serializers import CustomUserDetailsSerializer
 from contacts.models import Contact
 
 # Get the current UserModel
 UserModel = get_user_model()
+
+
+class GetUserInfo(APIView):
+    """
+    Get current user information relevant to permissions, names and staff status
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return UserModel.objects.get(pk=pk)
+        except UserModel.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = CustomUserDetailsSerializer(user)
+        return Response(serializer.data)
 
 
 class GetUpdateContactView(APIView):

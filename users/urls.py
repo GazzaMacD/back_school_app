@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("<int:pk>/profile/", views.GetUpdateContactView.as_view()),
+    path("<int:pk>/user/", views.GetUserInfo.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

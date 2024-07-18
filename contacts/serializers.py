@@ -12,7 +12,7 @@ class GetUpdateContactSerializer(serializers.ModelSerializer):
 class ContactUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = ("name",)
+        fields = ("name", "name_en")
 
 
 # Contact Form Serializers

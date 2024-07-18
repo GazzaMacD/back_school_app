@@ -6,7 +6,11 @@ from .models import Contact, ContactEmail, Note
 class GetUpdateContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = ("name", "name_en")
+        fields = (
+            "name",
+            "name_en",
+            "bday",
+        )
 
 
 class ContactUserSerializer(serializers.ModelSerializer):

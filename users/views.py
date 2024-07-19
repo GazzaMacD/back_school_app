@@ -61,6 +61,7 @@ class GetUpdateContactView(APIView):
                 {
                     "name": html.escape(serializer.validated_data.get("name")),
                     "name_en": html.escape(serializer.validated_data.get("name_en")),
+                    "bday": html.escape(serializer.validated_data.get("bday")),
                 }
             )
             serializer.save()

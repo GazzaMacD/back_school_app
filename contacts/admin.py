@@ -73,6 +73,7 @@ class ContactAdmin(admin.ModelAdmin):
                     "user",
                     "name",
                     "name_en",
+                    "bday",
                     "gender",
                     "status",
                     "ind_or_org",

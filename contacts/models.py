@@ -279,6 +279,13 @@ class Contact(TimeStampedModel):
         max_length=100,
         help_text="Full name in English, order should be same as name. Example 田中たろ should become Tanaka Taro in the field. Max length: 100char",
     )
+    bday = models.CharField(
+        _("birthday"),
+        blank=True,
+        null=False,
+        max_length=20,
+        help_text="Birthday as day and month ex: '10 September'. Max char 20",
+    )
     status = models.PositiveSmallIntegerField(
         _("Status"),
         null=False,

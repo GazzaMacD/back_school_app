@@ -21,7 +21,7 @@ from rest_framework import serializers
 from rest_framework import exceptions, serializers
 from rest_framework.exceptions import ValidationError
 
-from contacts.serializers import ContactUserSerializer
+from contacts.serializers import ContactUserSerializer, GetUpdateContactSerializer
 from .models import CustomUser
 
 # Get the UserModel
@@ -40,6 +40,7 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
 
     class Meta(UserDetailsSerializer.Meta):
         fields = (
+            "id",
             "email",
             "contact",
             "is_staff",

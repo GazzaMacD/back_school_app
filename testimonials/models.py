@@ -147,9 +147,9 @@ class TestimonialDetailPage(HeadlessMixin, Page):
         "Short Comment",
         blank=False,
         null=False,
-        max_length=300,
+        max_length=320,
         features=["bold"],
-        help_text="Required. Max length 300 chars. A short comment about the company to display in places on site.",
+        help_text="Required. Max length 320 chars. A short comment about the company to display in places on site.",
     )
     customer_interview = StreamField(
         [

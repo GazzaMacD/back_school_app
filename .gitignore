@@ -1,6 +1,7 @@
 # Django project
 /media/
 /static/
+/logs/
 *.sqlite3
 dev.py
 staging.py

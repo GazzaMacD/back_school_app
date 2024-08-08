@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     # project models
     "about",
     "addresses",
+    "campaigns",
     "contacts",
     "core",
     "courses",

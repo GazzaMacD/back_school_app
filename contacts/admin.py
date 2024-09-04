@@ -48,10 +48,7 @@ class OrganizationInline(admin.TabularInline):
     fk_name = "organization"
     can_delete = False
     extra = 0
-    exclude = [
-        "user",
-        "ind_or_org",
-    ]
+    exclude = ["user", "ind_or_org", "bday", "child_of"]
     readonly_fields = [
         "name",
         "name_en",
@@ -61,6 +58,9 @@ class OrganizationInline(admin.TabularInline):
     verbose_name = "Organization Contacts"
     verbose_name_plural = "Organization Contacts"
     classes = ["collapse"]
+
+    def has_add_permission(self, request, obj):
+        return False
 
 
 class ContactAdmin(admin.ModelAdmin):

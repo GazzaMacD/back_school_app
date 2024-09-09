@@ -11,7 +11,6 @@ from wagtail.models import Page
 from wagtail_headless_preview.models import HeadlessMixin
 from wagtail.fields import RichTextField
 
-
 from core.models import TimeStampedModel
 
 

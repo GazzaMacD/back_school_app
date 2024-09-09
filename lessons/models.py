@@ -41,33 +41,9 @@ class LessonCategoryFieldSerializer(Field):
         }
 
 
-class LessonRelatedFieldSerializer(Field):
-    def to_representation(self, value):
-        image = value.header_image
-        return {
-            "id": value.id,
-            "title": value.title,
-            "display_title": value.display_title,
-            "published_date": value.published_date,
-            "display_tagline": value.display_tagline,
-            "slug": value.slug,
-            "category": {
-                "name": value.category.name,
-                "ja_name": value.category.ja_name,
-                "slug": value.category.slug,
-            },
-            "image": {
-                "id": image.id,
-                "title": image.title,
-                "original": image.get_rendition("original").attrs_dict,
-                "thumbnail": image.get_rendition("fill-560x350").attrs_dict,
-            },
-        }
-
-
 # Pages
 class LessonListPage(HeadlessMixin, Page):
-    """Page where lessons will be categorized and listed"""
+    """Page where blog lessons will be categorized and listed"""
 
     # Model fields
     display_title = models.CharField(
@@ -110,7 +86,7 @@ class LessonListPage(HeadlessMixin, Page):
 
 
 class LessonDetailPage(HeadlessMixin, Page):
-    """Lesson Detail page with variable content options provided by stream fields"""
+    """Blog Lesson Detail page with variable content options provided by stream fields"""
 
     # Page header fields
     header_image = models.ForeignKey(
@@ -198,6 +174,16 @@ class LessonDetailPage(HeadlessMixin, Page):
         FieldPanel("lesson_content"),
         MultiFieldPanel(
             [
+                InlinePanel(
+                    "related_simple_banner_campaigns",
+                    label="Simple Banner Campaign",
+                    max_num=2,
+                ),
+            ],
+            heading="Campaigns",
+        ),
+        MultiFieldPanel(
+            [
                 InlinePanel("related_lessons", label="Lesson", max_num=4),
             ],
             heading="Related Lessons",
@@ -214,6 +200,7 @@ class LessonDetailPage(HeadlessMixin, Page):
         APIField("estimated_time"),
         APIField("category", serializer=LessonCategoryFieldSerializer()),
         APIField("lesson_content"),
+        APIField("related_simple_banner_campaigns"),
         APIField("related_lessons"),
     ]
 
@@ -274,6 +261,35 @@ class LessonCategory(models.Model):
         verbose_name_plural = "Lesson Categories"
 
 
+# =======
+# Related Lessons
+# =======
+
+
+class LessonRelatedFieldSerializer(Field):
+    def to_representation(self, value):
+        image = value.header_image
+        return {
+            "id": value.id,
+            "title": value.title,
+            "display_title": value.display_title,
+            "published_date": value.published_date,
+            "display_tagline": value.display_tagline,
+            "slug": value.slug,
+            "category": {
+                "name": value.category.name,
+                "ja_name": value.category.ja_name,
+                "slug": value.category.slug,
+            },
+            "image": {
+                "id": image.id,
+                "title": image.title,
+                "original": image.get_rendition("original").attrs_dict,
+                "thumbnail": image.get_rendition("fill-560x350").attrs_dict,
+            },
+        }
+
+
 class RelatedLessons(Orderable):
     """Orderable field for lessons that should be connected to this lesson"""
 
@@ -282,9 +298,14 @@ class RelatedLessons(Orderable):
         on_delete=models.CASCADE,
         related_name="related_lessons",
     )
-    lesson = models.ForeignKey("lessons.LessonDetailPage", on_delete=models.CASCADE)
+    lesson = models.ForeignKey(
+        "lessons.LessonDetailPage",
+        on_delete=models.CASCADE,
+    )
 
-    panels = [FieldPanel("lesson")]
+    panels = [
+        FieldPanel("lesson"),
+    ]
 
     api_fields = [
         APIField("lesson", serializer=LessonRelatedFieldSerializer()),
@@ -292,3 +313,44 @@ class RelatedLessons(Orderable):
 
     def __str__(self):
         return self.lesson.title
+
+
+# =======
+# Related Campaigns
+# =======
+
+
+class RelatedSimpleBannerCampaignFieldSerializer(Field):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "title": value.title,
+            "slug": value.slug,
+            "campaign_page_type": value.campaign_page_type,
+            "color_type": value.color_type,
+            "name_ja": value.name_ja,
+            "offer": value.offer,
+            "start_date": value.start_date,
+            "end_date": value.end_date,
+        }
+
+
+class RelatedSimpleBannerCampaign(Orderable):
+    page = ParentalKey(
+        LessonDetailPage,
+        on_delete=models.CASCADE,
+        related_name="related_simple_banner_campaigns",
+    )
+    campaign = models.ForeignKey(
+        "campaigns.CampaignSimpleBannerPage",
+        on_delete=models.CASCADE,
+    )
+    panels = [
+        FieldPanel("campaign"),
+    ]
+    api_fields = [
+        APIField("campaign", serializer=RelatedSimpleBannerCampaignFieldSerializer()),
+    ]
+
+    def __str__(self):
+        return self.campaign.title

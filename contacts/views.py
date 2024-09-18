@@ -1,3 +1,6 @@
+import html
+import re
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.mail import send_mail
@@ -23,6 +26,15 @@ class ContactFormView(APIView):
 
     def send_notification_email(self, email, validated_data):
         note = validated_data.get("contact_notes")[0].get("note")
+        # Sanitize note:
+        # Remove any html in the text
+        # Reduce note to accepted max 300 chars
+        # Remove all links
+        note = re.sub(
+            r"(https?:\/\/)(\s)*(www\.)?(\s)*((\w|\s)+\.)*([\w\-\s]+\/)*([\w\-]+)((\?)?[\w\s]*=\s*[\w\%&]*)*",
+            " **removed link** ",
+            html.escape(note)[0:300],
+        )
         name = validated_data.get("name")
         name_en = validated_data.get("name_en")
         subject = f"IMPORTANT: {name} ({name_en}) contact via XLingual Contact Form "

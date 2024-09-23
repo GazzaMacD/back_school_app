@@ -11,7 +11,7 @@ from rest_framework import status
 from django.conf import settings
 
 from core.custom_permissions import SafeIPsPermission
-from .models import Contact, ContactEmail
+from .models import Contact, ContactEmail, BannedEmail
 from .serializers import ContactFormSerializer, ContactFormEmailSerializer
 
 
@@ -22,7 +22,7 @@ class ContactFormView(APIView):
     NOTE: Permission checking domain name required here.
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = [SafeIPsPermission]
 
     def send_notification_email(self, email, validated_data):
         note = validated_data.get("contact_notes")[0].get("note")
@@ -84,6 +84,15 @@ class ContactFormView(APIView):
         if not email_serializer.is_valid():
             return Response(email_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         email = email_serializer.validated_data.get("email")
+        if email:
+            email = email.strip()
+        # Check to see if email in banned emails and reject if it is
+        if BannedEmail.objects.filter(email__iexact=email).exists():
+            return Response(
+                {"message": "banned email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+        # Now get the contact if any, associated with this mail
         contact = self.get_object(email)
 
         if not contact:

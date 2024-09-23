@@ -1,5 +1,9 @@
+import logging
+
 from rest_framework import permissions
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 class SafeIPsPermission(permissions.BasePermission):
@@ -14,4 +18,5 @@ class SafeIPsPermission(permissions.BasePermission):
             ip = ip.split(",")[-1]
         else:
             ip = request.META.get("REMOTE_ADDR")
-        return ip in settings.SAFE_IPS
+        ip_start = ip.split(".")[0]
+        return ip_start in settings.SAFE_IP_STARTS

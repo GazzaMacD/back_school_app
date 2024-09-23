@@ -453,3 +453,27 @@ class Note(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.title
+
+
+class BannedEmail(TimeStampedModel):
+    """Model to hold spam, junk and malicious emailers who mail us in the contact forms etc. Use this
+    model as base for actions which prevent spam etc"""
+
+    name = models.CharField(
+        _("name"),
+        null=False,
+        blank=False,
+        max_length=50,
+        help_text="Required. Max 50. Name the emailer uses in mail. Not important, just for convenience",
+    )
+    email = models.EmailField(
+        _("email address"),
+        null=False,
+        blank=False,
+        max_length=150,
+        unique=True,
+        help_text="Required. Is unique so can only be one row for this email address. Max 150",
+    )
+
+    def __str__(self) -> str:
+        return f"{self.name} <{self.email}>"

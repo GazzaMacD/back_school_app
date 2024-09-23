@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 
-from .models import Contact, ContactEmail, Note
+from .models import Contact, ContactEmail, Note, BannedEmail
 from addresses.admin import ContactAddressInline
 from telnumbers.admin import TelNumberInline
 
@@ -103,4 +103,10 @@ class ContactAdmin(admin.ModelAdmin):
     ]
 
 
+class BannedEmailAdmin(admin.ModelAdmin):
+    list_display = ("name", "email")
+
+
 admin.site.register(Contact, ContactAdmin)
+
+admin.site.register(BannedEmail, BannedEmailAdmin)

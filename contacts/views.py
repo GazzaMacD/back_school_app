@@ -22,7 +22,7 @@ class ContactFormView(APIView):
     NOTE: Permission checking domain name required here.
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = [SafeIPsPermission]
 
     def send_notification_email(self, email, validated_data):
         note = validated_data.get("contact_notes")[0].get("note")

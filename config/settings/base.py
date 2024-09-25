@@ -97,6 +97,8 @@ INSTALLED_APPS = [
     # simple JWT
     "rest_framework_simplejwt",
     "dj_rest_auth.registration",
+    # backups
+    "dbbackup",
 ]
 
 MIDDLEWARE = [
@@ -292,6 +294,10 @@ WAGTAILAPI_LIMIT_MAX = 30
 
 # auto field for id settings
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+# dbbackups
+DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
+DBBACKUP_STORAGE_OPTIONS = {"location": os.path.join(BASE_DIR, "../b_school_backups")}
 
 
 AUTH_USER_MODEL = "users.CustomUser"

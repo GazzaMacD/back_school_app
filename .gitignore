@@ -15,6 +15,7 @@ __pycache__
 .DS_Store
 *.swp
 /venv_bsa/
+/venv_xlbackup/
 /tmp/
 /.vagrant/
 /Vagrantfile.local

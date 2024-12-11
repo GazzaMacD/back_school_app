@@ -9,8 +9,10 @@ from wagtail.api import APIField
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.models import Page
 from wagtail_headless_preview.models import HeadlessMixin
-from wagtail.fields import RichTextField
+from wagtail.fields import RichTextField, StreamField
 
+from core.serializers import HeaderImageFieldSerializer
+from streams import customblocks
 from core.models import TimeStampedModel
 
 
@@ -249,6 +251,131 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
         APIField("color_type"),
         APIField("name_ja"),
         APIField("offer"),
+        APIField("tagline"),
+        APIField("start_date"),
+        APIField("end_date"),
+        APIField("additional_details"),
+    ]
+
+    # Page limitations, Meta and methods
+    parent_page_types = [
+        "campaigns.CampaignListPage",
+    ]
+
+    def __str__(self) -> str:
+        return self.title
+
+    def clean(self):
+        """Custom clean method to make start_date and end_date duplicate learning experience fields of same name. This denormalization and duplication is to reduce queries in the list views. Construct the slug string and replace auto generated slug with this string"""
+        if not self.start_date == self.campaign.start_date:
+            self.start_date = self.campaign.start_date
+        if not self.end_date == self.campaign.end_date:
+            self.end_date = self.campaign.end_date
+
+        # Make campaign model title and this display model title consistent
+        if not self.title == self.campaign.name:
+            self.title = self.campaign.name
+
+        # Construct slug stringo
+        slug = get_campaign_slug(self.title, self.start_date, self.end_date)
+        if not self.slug == slug:
+            self.slug = slug
+
+
+# ======= Image Banner  Page ===========
+
+
+class CampaignImageBannerPage(HeadlessMixin, Page):
+    """A page class representing a campaign with an Image as the main banner. Has a mandatory 'type' field to allow front end to determine display components based on this type."""
+
+    campaign = models.OneToOneField(
+        Campaign,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+        help_text="The associated campaign. IMPORTANT. PLease make sure the title on this page is the same as the campaign name.",
+    )
+    campaign_page_type = models.CharField(
+        _("Campaign Page Type"),
+        blank=False,
+        null=False,
+        default="image_banner",
+        editable=False,
+        max_length=20,
+        help_text="Auto generated",
+    )
+    banner_image = models.ForeignKey(
+        "wagtailimages.Image",
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+        related_name="+",
+        help_text="Image size: 2048px x 1280px. Please optimize image size before uploading.",
+    )
+    name_ja = models.CharField(
+        "Japanese Campaign Name",
+        blank=False,
+        null=False,
+        max_length=18,
+        help_text="Required. Max length 18 chars. Will be name of campaign displayed in the title tag for the page ",
+    )
+    tagline = models.CharField(
+        "Tagline",
+        blank=False,
+        null=False,
+        max_length=100,
+        help_text="Required. Max length 100 chars. Succint additional Japanese text to add marketing value to the description tag",
+    )
+    start_date = models.DateField(
+        "Start Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'campaign'",
+    )
+    end_date = models.DateField(
+        "End Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'campaign'",
+    )
+    additional_details = StreamField(
+        [
+            ("rich_text", customblocks.CustomRichTextBlock()),
+            ("text_width_img", customblocks.StandardCustomImageBlock()),
+            ("youtube", customblocks.YoutubeBlock()),
+        ],
+        use_json_field=True,
+        null=True,
+        blank=False,
+    )
+
+    # Admin panel configuration
+    content_panels = Page.content_panels + [
+        MultiFieldPanel(
+            [
+                FieldPanel("campaign"),
+                FieldPanel("campaign_page_type", read_only=True),
+                FieldPanel("banner_image"),
+                FieldPanel("name_ja"),
+                FieldPanel("tagline"),
+                FieldPanel("start_date", read_only=True),
+                FieldPanel("end_date", read_only=True),
+            ],
+            heading="Core Information",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("additional_details"),
+            ],
+            heading="Campaign Detail Information",
+        ),
+    ]
+
+    # Api configuration
+    api_fields = [
+        APIField("campaign_page_type"),
+        APIField("banner_image", serializer=HeaderImageFieldSerializer()),
+        APIField("name_ja"),
         APIField("tagline"),
         APIField("start_date"),
         APIField("end_date"),

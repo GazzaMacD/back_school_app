@@ -208,6 +208,22 @@ class ExamplesListBlock(blocks.StructBlock):
         label = "Example Sentences or Questions List"
 
 
+# =============== Show Hide Blocks ======================
+class ShowHideBlock(blocks.StructBlock):
+    """A block for simple title, sentence or question, which will be used by a details html tag or similar js version of this structure"""
+
+    showing = blocks.CharBlock(
+        max_length=255,
+    )
+    hidden = blocks.RichTextBlock(
+        features=["h4", "link", "ol", "ul"],
+    )
+
+    class Meta:
+        icon = "collapse-down"
+        label = "Show Hide Block"
+
+
 # =============== Wrong Right Example Blocks ======================
 class WrongRightBlock(blocks.StructBlock):
     """A block for a single wrong and right sentence example"""

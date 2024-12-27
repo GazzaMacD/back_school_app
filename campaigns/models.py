@@ -343,6 +343,7 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
             ("rich_text", customblocks.CustomRichTextBlock()),
             ("text_width_img", customblocks.StandardCustomImageBlock()),
             ("youtube", customblocks.YoutubeBlock()),
+            ("show_hide", customblocks.ShowHideBlock()),
         ],
         use_json_field=True,
         null=True,

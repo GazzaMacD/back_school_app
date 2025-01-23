@@ -474,6 +474,13 @@ class BannedEmail(TimeStampedModel):
         unique=True,
         help_text="Required. Is unique so can only be one row for this email address. Max 150",
     )
+    message = models.TextField(
+        _("message"),
+        null=False,
+        blank=False,
+        default="No mail associated",
+        help_text="Required. Email sent for post mail analysis, for safety sake",
+    )
 
     def __str__(self) -> str:
         return f"{self.name} <{self.email}>"

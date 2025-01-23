@@ -1,5 +1,6 @@
 import html
 import re
+import string
 
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -12,7 +13,11 @@ from django.conf import settings
 
 from core.custom_permissions import SafeIPsPermission
 from .models import Contact, ContactEmail, BannedEmail
-from .serializers import ContactFormSerializer, ContactFormEmailSerializer
+from .serializers import (
+    ContactFormSerializer,
+    ContactFormEmailSerializer,
+    BannedEmailSerializer,
+)
 
 
 class ContactFormView(APIView):
@@ -23,6 +28,22 @@ class ContactFormView(APIView):
     """
 
     permission_classes = [AllowAny]
+
+    def ascii_percentage_analysis(self, s, per):
+        """Function to analyze if a string contains mostly ascii strings by percentage.
+        Will take the string to analyse and a percentage integer and return True if over
+        percentage and False if below.
+        """
+        # change string to set to get 0(1)
+        test_set = set(string.ascii_letters + string.whitespace + string.punctuation)
+        total_char = 0
+        total_ascii = 0
+        per = int(per)
+        for char in s:
+            total_char += 1
+            if char in test_set:
+                total_ascii += 1
+        return (total_ascii / total_char) * 100 > per
 
     def send_notification_email(self, email, validated_data):
         note = validated_data.get("contact_notes")[0].get("note")
@@ -72,7 +93,6 @@ class ContactFormView(APIView):
             return None
 
     def post(self, request, format=None):
-        email = None
         emails = request.data.get("contact_emails", [])
         if not len(emails):
             return Response(
@@ -83,15 +103,45 @@ class ContactFormView(APIView):
         email_serializer = ContactFormEmailSerializer(data=email_dict)
         if not email_serializer.is_valid():
             return Response(email_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        email = email_serializer.validated_data.get("email")
+        email = email_serializer.validated_data.get("email", None)
         if email:
             email = email.strip()
-        # Check to see if email in banned emails and reject if it is
+
+        # =========== Deal with Junk here ============
+        # 1. Check to see if email in banned emails, if yes return 422 to front
+        # NOTE This code is valid while we consider that we are only getting contact mails in Japanese.
+        # A new strategy will be needed when the emails are for Japanese lessons.
+        # 2. Check to see if email contains too much english. For now (2025.01) probably junk so.
+        #   2.1 If yes then save the details in banned emails along with mail for future junk analysis purposes.
+
         if BannedEmail.objects.filter(email__iexact=email).exists():
+
             return Response(
                 {"message": "banned email"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
+        # get msg
+        notes = request.data.get("contact_notes", [])
+        if not len(notes):
+            return Response(
+                {"message": "banned email"},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            )
+        else:
+            message_dict = notes[0]
+            if self.ascii_percentage_analysis(message_dict["note"], 60):
+                name = request.data.get("name")
+                data = {"name": name, "email": email, "message": message_dict["note"]}
+                banned_email_serializer = BannedEmailSerializer(data=data)
+                if banned_email_serializer.is_valid():
+                    banned_email_serializer.save()
+                # In both is_valid() and not valid case use, 422
+                return Response(
+                    {"message": "banned email"},
+                    status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                )
+            else:
+                pass
         # Now get the contact if any, associated with this mail
         contact = self.get_object(email)
 
@@ -116,5 +166,5 @@ class ContactFormView(APIView):
                 serializer.save()
                 # NOTE send alert email here with Celery if needed
                 self.send_notification_email(email, serializer.validated_data)
-                return Response({"details": "ok"})
+                return Response({"details": "ok"}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

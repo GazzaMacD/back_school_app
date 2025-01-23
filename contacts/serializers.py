@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Contact, ContactEmail, Note
+from .models import Contact, ContactEmail, Note, BannedEmail
 
 
 class GetUpdateContactSerializer(serializers.ModelSerializer):
@@ -82,3 +82,9 @@ class ContactFormSerializer(serializers.ModelSerializer):
             note_dict["title"] = f"Email from {contact_email}"
             Note.objects.create(contact=instance, **note_dict)
         return instance
+
+
+class BannedEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BannedEmail
+        fields = ("name", "email", "message")

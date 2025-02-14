@@ -65,6 +65,10 @@ class OrganizationInline(admin.TabularInline):
 
 class ContactAdmin(admin.ModelAdmin):
     list_display = ("name_en", "name", "user", "status", "organization")
+    search_fields = (
+        "name_en",
+        "name",
+    )
     fieldsets = [
         (
             "Basic information",

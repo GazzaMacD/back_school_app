@@ -12,7 +12,7 @@ dj-rest-auth==4.0.1
 Django==4.2.1
 django-allauth==0.54.0
 django-cors-headers==4.0.0
-django-debug-toolbar==4.1.0
+django-dbbackup==4.2.1
 django-filter==23.5
 django-modelcluster==6.3
 django-permissionedforms==0.1

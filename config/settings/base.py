@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     "telnumbers",
     "testimonials",
     "users",
+    "videocalls",
     # Rest and auth
     "rest_framework",
     "rest_framework.authtoken",

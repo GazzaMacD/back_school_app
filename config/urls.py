@@ -6,7 +6,7 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from dj_rest_auth.views import PasswordResetConfirmView
-from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView
+from dj_rest_auth.registration.views import ConfirmEmailView
 
 from search import views as search_views
 from .api import api_router
@@ -34,6 +34,7 @@ if settings.DEBUG:
 v2 = "api/v2"
 urlpatterns = urlpatterns + [
     # API routes
+    path(f"{v2}/video-calls/", include("videocalls.urls")),
     path(f"{v2}/supersaas-schedules/", include("schedules.urls")),
     path(f"{v2}/users/", include("users.urls")),
     path(f"{v2}/contact/", include("contacts.urls")),

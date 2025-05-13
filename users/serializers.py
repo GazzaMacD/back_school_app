@@ -18,10 +18,10 @@ try:
 except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 from rest_framework import serializers
-from rest_framework import exceptions, serializers
+from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 
-from contacts.serializers import ContactUserSerializer, GetUpdateContactSerializer
+from contacts.serializers import ContactUserSerializer
 from .models import CustomUser
 
 # Get the UserModel
@@ -53,7 +53,10 @@ class CustomUserContactNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ("name",)
+        fields = (
+            "name",
+            "id",
+        )
 
 
 class CustomLoginSerializer(serializers.Serializer):

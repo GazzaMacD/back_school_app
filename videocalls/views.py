@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 # from rest_framework.permissions import IsAuthenticated
 
 from .models import VideoCall
-from .serializers import VideoCallListSerializer
+from .serializers import VideoCallSerializer
 
 
 class VideoCallListView(APIView):
@@ -14,5 +14,5 @@ class VideoCallListView(APIView):
 
     def get(self, format=None):
         teachers = VideoCall.objects.all()
-        serializer = VideoCallListSerializer(teachers, many=True)
+        serializer = VideoCallSerializer(teachers, many=True)
         return Response(serializer.data)

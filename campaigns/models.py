@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import date
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +25,11 @@ def get_campaign_slug(title, start_date, end_date):
     return f"{slugify(title, allow_unicode=True)}-{start}-to-{end}"
 
 
+def default_marketing_start():
+    d = date(2020, 1, 1)
+    return d
+
+
 # Django Campaign Models
 
 CAMPAIGN_DESC_DEFAULT = """[BRIEF]\n
@@ -47,6 +53,13 @@ class Campaign(TimeStampedModel):
         max_length=100,
         help_text="Required. 100 Char max. Campaign name in English",
     )
+    marketing_start_date = models.DateField(
+        _("Marketing Start Date"),
+        blank=False,
+        null=False,
+        default=default_marketing_start,
+        help_text="Required. This will determine the visibility of the campaign once the CMS page has been created",
+    )
     start_date = models.DateField(
         _("Start Date"),
         blank=False,
@@ -66,12 +79,29 @@ class Campaign(TimeStampedModel):
         default=CAMPAIGN_DESC_DEFAULT,
         help_text="Description of key elements of campaign. Please use SMART here.",
     )
-    total_customer_increase = models.PositiveSmallIntegerField(
-        _("Total Customer Increase"),
+    target_total_customer_increase = models.PositiveSmallIntegerField(
+        _("Target Cust. Inc."),
         blank=False,
         null=False,
         default=0,
-        help_text="Required. Completed after campaign results finalized",
+        help_text="Required. Complete 'Target Customer Increase' before the campaign start date",
+    )
+    total_customer_increase = models.PositiveSmallIntegerField(
+        _("Total Cust. Inc."),
+        blank=False,
+        null=False,
+        default=0,
+        help_text="Required. Update 'Actual Total Customer Increase' as results appear",
+    )
+    target_monthly_recurring_revenue_increase = models.DecimalField(
+        _("Target Rev Inc. (￥)"),
+        blank=False,
+        null=False,
+        max_digits=10,
+        decimal_places=0,
+        default=Decimal("0"),
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text="Required. Complete 'Target Monthly Recurring Revenue Increase' before the campaign start date",
     )
     monthly_recurring_revenue_increase = models.DecimalField(
         _("Monthly Rec Rev Increase (￥)"),
@@ -81,14 +111,20 @@ class Campaign(TimeStampedModel):
         decimal_places=0,
         default=Decimal("0"),
         validators=[MinValueValidator(Decimal("0"))],
-        help_text="Required. Completed after campaign results finalized in yen",
+        help_text="Required. Update 'Actual Monthly Recurring Revenue Increase' as results come in",
     )
     smart_goals_achieved = models.BooleanField(
         _("Smart Goals Achieved"),
         blank=False,
         null=False,
         default=False,
-        help_text="Required. Completed after campaign results finalized. Please consider 'S' in SMART to answer this question",
+        help_text="Required. Completed after campaign results finalized. Please consider 'M' in SMART to answer this question",
+    )
+    note = models.TextField(
+        _("Campaign Note"),
+        blank=True,
+        null=False,
+        help_text="Notes regarding this campaign if any",
     )
 
     def __str__(self) -> str:

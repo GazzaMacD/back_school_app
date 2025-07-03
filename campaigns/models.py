@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import date
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +25,11 @@ def get_campaign_slug(title, start_date, end_date):
     return f"{slugify(title, allow_unicode=True)}-{start}-to-{end}"
 
 
+def default_marketing_start():
+    d = date(2020, 1, 1)
+    return d
+
+
 # Django Campaign Models
 
 CAMPAIGN_DESC_DEFAULT = """[BRIEF]\n
@@ -47,6 +53,13 @@ class Campaign(TimeStampedModel):
         max_length=100,
         help_text="Required. 100 Char max. Campaign name in English",
     )
+    marketing_start_date = models.DateField(
+        _("Marketing Start Date"),
+        blank=False,
+        null=False,
+        default=default_marketing_start,
+        help_text="Required. This will determine the visibility of the campaign once the CMS page has been created",
+    )
     start_date = models.DateField(
         _("Start Date"),
         blank=False,
@@ -66,12 +79,29 @@ class Campaign(TimeStampedModel):
         default=CAMPAIGN_DESC_DEFAULT,
         help_text="Description of key elements of campaign. Please use SMART here.",
     )
-    total_customer_increase = models.PositiveSmallIntegerField(
-        _("Total Customer Increase"),
+    target_total_customer_increase = models.PositiveSmallIntegerField(
+        _("Target Cust. Inc."),
         blank=False,
         null=False,
         default=0,
-        help_text="Required. Completed after campaign results finalized",
+        help_text="Required. Complete 'Target Customer Increase' before the campaign start date",
+    )
+    total_customer_increase = models.PositiveSmallIntegerField(
+        _("Total Cust. Inc."),
+        blank=False,
+        null=False,
+        default=0,
+        help_text="Required. Update 'Actual Total Customer Increase' as results appear",
+    )
+    target_monthly_recurring_revenue_increase = models.DecimalField(
+        _("Target Rev Inc. (￥)"),
+        blank=False,
+        null=False,
+        max_digits=10,
+        decimal_places=0,
+        default=Decimal("0"),
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text="Required. Complete 'Target Monthly Recurring Revenue Increase' before the campaign start date",
     )
     monthly_recurring_revenue_increase = models.DecimalField(
         _("Monthly Rec Rev Increase (￥)"),
@@ -81,14 +111,20 @@ class Campaign(TimeStampedModel):
         decimal_places=0,
         default=Decimal("0"),
         validators=[MinValueValidator(Decimal("0"))],
-        help_text="Required. Completed after campaign results finalized in yen",
+        help_text="Required. Update 'Actual Monthly Recurring Revenue Increase' as results come in",
     )
     smart_goals_achieved = models.BooleanField(
         _("Smart Goals Achieved"),
         blank=False,
         null=False,
         default=False,
-        help_text="Required. Completed after campaign results finalized. Please consider 'S' in SMART to answer this question",
+        help_text="Required. Completed after campaign results finalized. Please consider 'M' in SMART to answer this question",
+    )
+    note = models.TextField(
+        _("Campaign Note"),
+        blank=True,
+        null=False,
+        help_text="Notes regarding this campaign if any",
     )
 
     def __str__(self) -> str:
@@ -189,6 +225,12 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
         max_length=100,
         help_text="Required. Max length 100 chars. Succint additional text to add marketing value to the banner",
     )
+    marketing_start_date = models.DateField(
+        "Marketing Start Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'campaign'",
+    )
     start_date = models.DateField(
         "Start Date",
         blank=True,
@@ -232,6 +274,7 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
                 FieldPanel("name_ja"),
                 FieldPanel("offer"),
                 FieldPanel("tagline"),
+                FieldPanel("marketing_start_date", read_only=True),
                 FieldPanel("start_date", read_only=True),
                 FieldPanel("end_date", read_only=True),
             ],
@@ -252,6 +295,7 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
         APIField("name_ja"),
         APIField("offer"),
         APIField("tagline"),
+        APIField("marketing_start_date"),
         APIField("start_date"),
         APIField("end_date"),
         APIField("additional_details"),
@@ -267,6 +311,8 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
 
     def clean(self):
         """Custom clean method to make start_date and end_date duplicate learning experience fields of same name. This denormalization and duplication is to reduce queries in the list views. Construct the slug string and replace auto generated slug with this string"""
+        if not self.marketing_start_date == self.campaign.marketing_start_date:
+            self.marketing_start_date = self.campaign.marketing_start_date
         if not self.start_date == self.campaign.start_date:
             self.start_date = self.campaign.start_date
         if not self.end_date == self.campaign.end_date:
@@ -326,6 +372,12 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
         max_length=100,
         help_text="Required. Max length 100 chars. Succint additional Japanese text to add marketing value to the description tag",
     )
+    marketing_start_date = models.DateField(
+        "Marketing Start Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'campaign'. Will determine when the page is visible on the home page and other places on site",
+    )
     start_date = models.DateField(
         "Start Date",
         blank=True,
@@ -359,6 +411,7 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
                 FieldPanel("banner_image"),
                 FieldPanel("name_ja"),
                 FieldPanel("tagline"),
+                FieldPanel("marketing_start_date", read_only=True),
                 FieldPanel("start_date", read_only=True),
                 FieldPanel("end_date", read_only=True),
             ],
@@ -378,6 +431,7 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
         APIField("banner_image", serializer=HeaderImageFieldSerializer()),
         APIField("name_ja"),
         APIField("tagline"),
+        APIField("marketing_start_date"),
         APIField("start_date"),
         APIField("end_date"),
         APIField("additional_details"),
@@ -393,6 +447,8 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
 
     def clean(self):
         """Custom clean method to make start_date and end_date duplicate learning experience fields of same name. This denormalization and duplication is to reduce queries in the list views. Construct the slug string and replace auto generated slug with this string"""
+        if not self.marketing_start_date == self.campaign.marketing_start_date:
+            self.marketing_start_date = self.campaign.marketing_start_date
         if not self.start_date == self.campaign.start_date:
             self.start_date = self.campaign.start_date
         if not self.end_date == self.campaign.end_date:

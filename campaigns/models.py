@@ -372,6 +372,12 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
         max_length=100,
         help_text="Required. Max length 100 chars. Succint additional Japanese text to add marketing value to the description tag",
     )
+    marketing_start_date = models.DateField(
+        "Marketing Start Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'campaign'. Will determine when the page is visible on the home page and other places on site",
+    )
     start_date = models.DateField(
         "Start Date",
         blank=True,
@@ -405,6 +411,7 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
                 FieldPanel("banner_image"),
                 FieldPanel("name_ja"),
                 FieldPanel("tagline"),
+                FieldPanel("marketing_start_date", read_only=True),
                 FieldPanel("start_date", read_only=True),
                 FieldPanel("end_date", read_only=True),
             ],
@@ -424,6 +431,7 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
         APIField("banner_image", serializer=HeaderImageFieldSerializer()),
         APIField("name_ja"),
         APIField("tagline"),
+        APIField("marketing_start_date"),
         APIField("start_date"),
         APIField("end_date"),
         APIField("additional_details"),
@@ -439,6 +447,8 @@ class CampaignImageBannerPage(HeadlessMixin, Page):
 
     def clean(self):
         """Custom clean method to make start_date and end_date duplicate learning experience fields of same name. This denormalization and duplication is to reduce queries in the list views. Construct the slug string and replace auto generated slug with this string"""
+        if not self.marketing_start_date == self.campaign.marketing_start_date:
+            self.marketing_start_date = self.campaign.marketing_start_date
         if not self.start_date == self.campaign.start_date:
             self.start_date = self.campaign.start_date
         if not self.end_date == self.campaign.end_date:

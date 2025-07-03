@@ -225,6 +225,12 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
         max_length=100,
         help_text="Required. Max length 100 chars. Succint additional text to add marketing value to the banner",
     )
+    marketing_start_date = models.DateField(
+        "Marketing Start Date",
+        blank=True,
+        null=False,
+        help_text="Read only field that gets value from 'campaign'",
+    )
     start_date = models.DateField(
         "Start Date",
         blank=True,
@@ -268,6 +274,7 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
                 FieldPanel("name_ja"),
                 FieldPanel("offer"),
                 FieldPanel("tagline"),
+                FieldPanel("marketing_start_date", read_only=True),
                 FieldPanel("start_date", read_only=True),
                 FieldPanel("end_date", read_only=True),
             ],
@@ -288,6 +295,7 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
         APIField("name_ja"),
         APIField("offer"),
         APIField("tagline"),
+        APIField("marketing_start_date"),
         APIField("start_date"),
         APIField("end_date"),
         APIField("additional_details"),
@@ -303,6 +311,8 @@ class CampaignSimpleBannerPage(HeadlessMixin, Page):
 
     def clean(self):
         """Custom clean method to make start_date and end_date duplicate learning experience fields of same name. This denormalization and duplication is to reduce queries in the list views. Construct the slug string and replace auto generated slug with this string"""
+        if not self.marketing_start_date == self.campaign.marketing_start_date:
+            self.marketing_start_date = self.campaign.marketing_start_date
         if not self.start_date == self.campaign.start_date:
             self.start_date = self.campaign.start_date
         if not self.end_date == self.campaign.end_date:

@@ -6,9 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.utils import timezone
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 from modelcluster.fields import ParentalKey
 from rest_framework.fields import Field
 from wagtail.models import Page, Orderable
@@ -407,7 +404,7 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         "Intro - Japanese Title",
         blank=False,
         null=False,
-        max_length=20,
+        max_length=30,
         help_text="Required. Max length 20 characters, 15 or less is ideal",
     )
     intro = RichTextField(
@@ -425,15 +422,15 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         "LE - Upcoming English title",
         blank=False,
         null=False,
-        max_length=25,
-        help_text="Required. Max length 25, 15 or less is ideal",
+        max_length=35,
+        help_text="Required. Max length 35",
     )
     upcoming_jp_title = models.CharField(
         "Mission - Japanese Title",
         blank=False,
         null=False,
-        max_length=20,
-        help_text="Required. Max length 20 characters, 15 or less is ideal",
+        max_length=30,
+        help_text="Required. Max length 30",
     )
 
     # Experiences gallery
@@ -441,15 +438,15 @@ class LearningExperienceListPage(HeadlessMixin, Page):
         "LE - Gallery English title",
         blank=False,
         null=False,
-        max_length=25,
-        help_text="Required. Max length 25, 15 or less is ideal",
+        max_length=35,
+        help_text="Required. Max length 35",
     )
     gallery_jp_title = models.CharField(
         "LE - Japanese Title",
         blank=False,
         null=False,
-        max_length=20,
-        help_text="Required. Max length 20 characters, 15 or less is ideal",
+        max_length=30,
+        help_text="Required. Max length 30",
     )
     experiences_gallery = StreamField(
         [

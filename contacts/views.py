@@ -2,8 +2,6 @@ import html
 import re
 import string
 
-from django.shortcuts import render
-from django.http import JsonResponse
 from django.core.mail import send_mail
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
@@ -11,8 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 
-from core.custom_permissions import SafeIPsPermission
-from .models import Contact, ContactEmail, BannedEmail
+from .models import ContactEmail, BannedEmail
 from .serializers import (
     ContactFormSerializer,
     ContactFormEmailSerializer,
@@ -75,13 +72,17 @@ class ContactFormView(APIView):
             "Thanks\n\n "
             "Xlingual Server"
         )
-        send_mail(
-            subject=subject,
-            message=msg,
-            from_email=from_who,
-            recipient_list=to_who,
-            fail_silently=False,
-        )
+        try:
+            send_mail(
+                subject=subject,
+                message=msg,
+                from_email=from_who,
+                recipient_list=to_who,
+                fail_silently=False,
+            )
+
+        except Exception as e:
+            raise e
 
     def get_object(self, email):
         qs = ContactEmail.objects.filter(email__iexact=email)
@@ -115,7 +116,6 @@ class ContactFormView(APIView):
         #   2.1 If yes then save the details in banned emails along with mail for future junk analysis purposes.
 
         if BannedEmail.objects.filter(email__iexact=email).exists():
-
             return Response(
                 {"message": "banned email"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -165,6 +165,14 @@ class ContactFormView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 # NOTE send alert email here with Celery if needed
-                self.send_notification_email(email, serializer.validated_data)
+                try:
+                    self.send_notification_email(email, serializer.validated_data)
+                except Exception as e:
+                    print(e)
+                    return Response(
+                        {"message": "Send mail failed for some reason"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    )
+
                 return Response({"details": "ok"}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

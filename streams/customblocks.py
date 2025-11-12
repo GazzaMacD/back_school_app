@@ -258,13 +258,13 @@ class MCQuestionBlock(blocks.StructBlock):
         max_length=255,
     )
     correct_answer = blocks.CharBlock(
-        max_length=50,
+        max_length=200,
     )
     incorrect_answer1 = blocks.CharBlock(
-        max_length=50,
+        max_length=200,
     )
     incorrect_answer2 = blocks.CharBlock(
-        max_length=50,
+        max_length=200,
     )
 
     class Meta:
@@ -276,8 +276,8 @@ class MCQuestionsBlock(blocks.StructBlock):
     """A block for a series of multiple choice questions with title and intro section"""
 
     title = blocks.CharBlock(
-        max_length=30,
-        help_text="A short title for the series of multiple choice questions. Max 30 chars",
+        max_length=100,
+        help_text="A short title for the series of multiple choice questions. Max 100 chars",
     )
     intro = blocks.TextBlock(
         required=False,
@@ -422,10 +422,10 @@ class TwoPersonLinesBlock(blocks.StructBlock):
     """A simple block for two peoples conversation lines"""
 
     person_one = blocks.CharBlock(
-        max_length=255,
+        max_length=400,
     )
     person_two = blocks.CharBlock(
-        max_length=255,
+        max_length=400,
     )
 
     class Meta:
@@ -437,18 +437,18 @@ class ConversationBlock(blocks.StructBlock):
     """A block to compose conversations between two people for educational purposes"""
 
     title = blocks.CharBlock(
-        max_length=50,
+        max_length=100,
         help_text="A short title for the conversation. Max 50 chars",
     )
     intro = blocks.TextBlock(
         help_text="Set the scene of the conversation",
     )
     person_one_name = blocks.CharBlock(
-        max_length=10,
+        max_length=20,
         help_text="First person in conversation name, correlates to person one in following blocks. Please use names starting with different letters. Eg. Bob for first person and Sarah for second person. B and S in this example",
     )
     person_two_name = blocks.CharBlock(
-        max_length=10,
+        max_length=20,
         help_text="Second person in conversation name, correlates to person two in following blocks.",
     )
     conversation = blocks.ListBlock(TwoPersonLinesBlock())

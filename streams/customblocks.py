@@ -258,13 +258,13 @@ class MCQuestionBlock(blocks.StructBlock):
         max_length=255,
     )
     correct_answer = blocks.CharBlock(
-        max_length=50,
+        max_length=200,
     )
     incorrect_answer1 = blocks.CharBlock(
-        max_length=50,
+        max_length=200,
     )
     incorrect_answer2 = blocks.CharBlock(
-        max_length=50,
+        max_length=200,
     )
 
     class Meta:
@@ -276,8 +276,8 @@ class MCQuestionsBlock(blocks.StructBlock):
     """A block for a series of multiple choice questions with title and intro section"""
 
     title = blocks.CharBlock(
-        max_length=30,
-        help_text="A short title for the series of multiple choice questions. Max 30 chars",
+        max_length=100,
+        help_text="A short title for the series of multiple choice questions. Max 100 chars",
     )
     intro = blocks.TextBlock(
         required=False,
